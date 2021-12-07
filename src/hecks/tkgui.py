@@ -736,6 +736,7 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
     def _on_hbar(self, *args):
         self._cells_canvas.xview(*args)
         self._offset_canvas.xview(*args)
+        # self._cells_pixel_x = self._cells_canvas.canvasx(0)
         view_ratio_x = self._offset_canvas.xview()[0]
         self._cells_pixel_x = floor(self._cells_pixel_size[0] * view_ratio_x)
 
@@ -1647,7 +1648,8 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         return self.pixel_to_cursor_coords(event.x + self._cells_pixel_x, event.y)
 
     def event_to_char_coords(self, event) -> CharCoords:
-        char_x, char_y = self.pixel_to_char_coords(event.x + self._cells_pixel_x, event.y)
+        chars_pixel_x = self._chars_canvas.canvasx(0)
+        char_x, char_y = self.pixel_to_char_coords(event.x + chars_pixel_x, event.y)
         char_x = max(0, min(floor(char_x), self._status.line_length - 1))
         char_y = floor(char_y)
         return char_x, char_y
@@ -2830,6 +2832,7 @@ class UserInterface(BaseUserInterface):
 
     def update_menus_by_selection(self):
         status = self.engine.status
+        # TODO: cache condition to skip useless GUI calls
         state = tk.NORMAL if status.sel_mode else tk.DISABLED
 
         menu = self.menu_edit
@@ -2866,6 +2869,7 @@ class UserInterface(BaseUserInterface):
         start = memory.start
         endex = memory.endex
 
+        # TODO: cache condition to skip useless GUI calls
         if status.sel_mode or start <= address < endex:
             state = tk.NORMAL
         else:
@@ -2886,6 +2890,7 @@ class UserInterface(BaseUserInterface):
         for label in labels:
             toolbar.get_widget(label).configure(state=state)
 
+        # TODO: cache condition to skip useless GUI calls
         if status.sel_mode or (start <= address < endex and memory.peek(address) is None):
             state = tk.NORMAL
         else:

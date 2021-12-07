@@ -356,7 +356,7 @@ def clipboard_to_memory(
         while line:
             data = decompressor(decoder(line.encode('ascii')))
             if len(data) < size:
-                raise ValueError(f'Expecting {size} byets, got {len(data)}')
+                raise ValueError(f'Expecting {size} bytes, got {len(data)}')
             elif len(data) > size:
                 data = data[:size]
             memory.write(address, data)
