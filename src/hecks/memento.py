@@ -20,6 +20,7 @@ import tkinter as tk
 from math import floor
 from typing import MutableMapping
 from typing import Optional
+from typing import List
 from typing import Tuple
 
 from .common import BaseEngine
@@ -30,9 +31,10 @@ from .utils import VALUE_FORMAT_CHAR
 from .utils import VALUE_FORMAT_PREFIX
 from .utils import VALUE_FORMAT_SUFFIX
 from .utils import ValueFormatEnum
-from bytesparse._py import Address
-from bytesparse._py import Memory
-from bytesparse._py import Value
+from bytesparse.base import Address
+from bytesparse.base import AnyBytes
+from bytesparse.base import Value
+from bytesparse.inplace import Memory
 
 
 # =====================================================================================================================
@@ -76,12 +78,23 @@ class MoveMemory(BaseMemento):
     ):
         super().__init__(engine, status)
         self._offset: Address = offset
+        self._backups: List[Memory] = []
 
     def redo(self) -> None:
-        self._engine.shift_memory(self._offset)  # FIXME: restore trimmed chunks
+        backups = self._backups
+        backups.clear()
+        memory = self._status.memory
+        memory.shift(self._offset, backups=backups)
+        # FIXME: Update widget memory data
+        # FIXME: Move cursor to start of shifted block
 
     def undo(self) -> None:
-        self._engine.shift_memory(-self._offset)  # FIXME: restore trimmed chunks
+        memory = self._status.memory
+        memory.shift(-self._offset)
+        for backup in reversed(self._backups):
+            memory.write(0, backup)
+        # FIXME: Update widget memory data
+        # FIXME: Move cursor to start of first backup block
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -91,11 +104,60 @@ class WriteData(BaseMemento):
         self,
         engine: BaseEngine,
         status: EngineStatus,
+        address: Address,
+        data: AnyBytes,
     ):
         super().__init__(engine, status)
+        self._address: Address = address
+        self._data: AnyBytes = data
+        self._backups: List[Memory] = []
 
     def redo(self) -> None:
-        raise NotImplementedError  # TODO
+        backups = self._backups
+        backups.clear()
+        memory = self._status.memory
+        memory.write(self._address, self._data, backups=backups)
+        # FIXME: Update widget memory data
+        # FIXME: Move cursor to endex of written block
 
     def undo(self) -> None:
-        raise NotImplementedError  # TODO
+        memory = self._status.memory
+        memory.clear(self._address, len(self._data))
+        for backup in reversed(self._backups):
+            memory.write(0, backup)
+        # FIXME: Update widget memory data
+        # FIXME: Move cursor to start of first backup block
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+class ClearData(BaseMemento):
+
+    def __init__(
+        self,
+        engine: BaseEngine,
+        status: EngineStatus,
+        address: Address,
+        size: int,
+    ):
+        if size < 1:
+            raise ValueError('size must be positive')
+        super().__init__(engine, status)
+        self._address: Address = address
+        self._size: int = size
+        self._backups: List[Memory] = []
+
+    def redo(self) -> None:
+        backups = self._backups
+        backups.clear()
+        memory = self._status.memory
+        memory.clear(self._address, self._address + self._size, backups=backups)
+        # FIXME: Update widget memory data
+        # FIXME: Move cursor to endex of cleared block
+
+    def undo(self) -> None:
+        memory = self._status.memory
+        memory.clear(self._address, self._address + self._size)
+        for backup in reversed(self._backups):
+            memory.write(0, backup)
+        # FIXME: Update widget memory data
+        # FIXME: Move cursor to start of first backup block
