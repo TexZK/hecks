@@ -289,25 +289,25 @@ class EngineStatus:
 
 class EngineFileCallbacks:
 
-    def on_file_new(self: 'EngineFileCallbacks') -> None:
+    def on_file_new(self) -> None:
         raise NotImplementedError
 
-    def on_file_open(self: 'EngineFileCallbacks') -> None:
+    def on_file_open(self) -> None:
         raise NotImplementedError
 
-    def on_file_import(self: 'EngineFileCallbacks') -> None:
+    def on_file_import(self) -> None:
         raise NotImplementedError
 
-    def on_file_save(self: 'EngineFileCallbacks') -> None:
+    def on_file_save(self) -> None:
         raise NotImplementedError
 
-    def on_file_save_as(self: 'EngineFileCallbacks') -> None:
+    def on_file_save_as(self) -> None:
         raise NotImplementedError
 
-    def on_file_settings(self: 'EngineFileCallbacks') -> None:
+    def on_file_settings(self) -> None:
         raise NotImplementedError
 
-    def on_file_exit(self: 'EngineFileCallbacks') -> None:
+    def on_file_exit(self) -> None:
         raise NotImplementedError
 
 
@@ -315,61 +315,61 @@ class EngineFileCallbacks:
 
 class EngineEditCallbacks:
 
-    def on_edit_undo(self: 'EngineEditCallbacks') -> None:
+    def on_edit_undo(self) -> None:
         raise NotImplementedError
 
-    def on_edit_redo(self: 'EngineEditCallbacks') -> None:
+    def on_edit_redo(self) -> None:
         raise NotImplementedError
 
-    def on_edit_cut(self: 'EngineEditCallbacks') -> None:
+    def on_edit_cut(self) -> None:
         raise NotImplementedError
 
-    def on_edit_copy(self: 'EngineEditCallbacks') -> None:
+    def on_edit_copy(self) -> None:
         raise NotImplementedError
 
-    def on_edit_paste(self: 'EngineEditCallbacks') -> None:
+    def on_edit_paste(self) -> None:
         raise NotImplementedError
 
-    def on_edit_delete(self: 'EngineEditCallbacks') -> None:
+    def on_edit_delete(self) -> None:
         raise NotImplementedError
 
-    def on_edit_cursor_mode(self: 'EngineEditCallbacks') -> None:
+    def on_edit_cursor_mode(self) -> None:
         raise NotImplementedError
 
-    def on_edit_clear(self: 'EngineEditCallbacks') -> None:
+    def on_edit_clear(self) -> None:
         raise NotImplementedError
 
-    def on_edit_reserve(self: 'EngineEditCallbacks') -> None:
+    def on_edit_reserve(self) -> None:
         raise NotImplementedError
 
-    def on_edit_fill(self: 'EngineEditCallbacks') -> None:
+    def on_edit_fill(self) -> None:
         raise NotImplementedError
 
-    def on_edit_flood(self: 'EngineEditCallbacks') -> None:
+    def on_edit_flood(self) -> None:
         raise NotImplementedError
 
-    def on_edit_crop(self: 'EngineEditCallbacks') -> None:
+    def on_edit_crop(self) -> None:
         raise NotImplementedError
 
-    def on_edit_move_focus(self: 'EngineEditCallbacks') -> None:
+    def on_edit_move_focus(self) -> None:
         raise NotImplementedError
 
-    def on_edit_move_apply(self: 'EngineEditCallbacks') -> None:
+    def on_edit_move_apply(self) -> None:
         raise NotImplementedError
 
-    def on_edit_export(self: 'EngineEditCallbacks') -> None:
+    def on_edit_export(self) -> None:
         raise NotImplementedError
 
-    def on_edit_select_all(self: 'EngineEditCallbacks') -> None:
+    def on_edit_select_all(self) -> None:
         raise NotImplementedError
 
-    def on_edit_select_range(self: 'EngineEditCallbacks') -> None:
+    def on_edit_select_range(self) -> None:
         raise NotImplementedError
 
-    def on_edit_copy_address(self: 'EngineEditCallbacks') -> None:
+    def on_edit_copy_address(self) -> None:
         raise NotImplementedError
 
-    def on_edit_find(self: 'EngineEditCallbacks') -> None:
+    def on_edit_find(self) -> None:
         raise NotImplementedError
 
 
@@ -377,16 +377,16 @@ class EngineEditCallbacks:
 
 class EngineViewCallbacks:
 
-    def on_view_line_length_custom(self: 'EngineViewCallbacks') -> None:
+    def on_view_line_length_custom(self) -> None:
         raise NotImplementedError
 
-    def on_view_address_bits_custom(self: 'EngineViewCallbacks') -> None:
+    def on_view_address_bits_custom(self) -> None:
         raise NotImplementedError
 
-    def on_view_chars_encoding_custom(self: 'EngineViewCallbacks') -> None:
+    def on_view_chars_encoding_custom(self) -> None:
         raise NotImplementedError
 
-    def on_view_redraw(self: 'EngineViewCallbacks') -> None:
+    def on_view_redraw(self) -> None:
         raise NotImplementedError
 
 
@@ -394,76 +394,76 @@ class EngineViewCallbacks:
 
 class EngineNavigationCallbacks:
 
-    def on_nav_editor_focus(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_editor_focus(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_address_start_focus(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_address_start_focus(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_address_start_apply(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_address_start_apply(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_address_endin_focus(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_address_endin_focus(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_address_endin_apply(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_address_endin_apply(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_address_copy(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_address_copy(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_start(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_start(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_endin(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_endin(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_memory_endex(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_memory_endex(self) -> None:
         raise NotImplementedError
 
-    def on_nav_address_skip(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_address_skip(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_block_previous(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_block_previous(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_block_next(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_block_next(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_block_start(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_block_start(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_block_endin(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_block_endin(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_byte_previous(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_byte_previous(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_byte_next(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_byte_next(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_line_start(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_line_start(self) -> None:
         raise NotImplementedError
 
-    def on_nav_goto_line_endin(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_goto_line_endin(self) -> None:
         raise NotImplementedError
 
-    def on_nav_scroll_line_up(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_scroll_line_up(self) -> None:
         raise NotImplementedError
 
-    def on_nav_scroll_line_down(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_scroll_line_down(self) -> None:
         raise NotImplementedError
 
-    def on_nav_scroll_page_up(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_scroll_page_up(self) -> None:
         raise NotImplementedError
 
-    def on_nav_scroll_page_down(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_scroll_page_down(self) -> None:
         raise NotImplementedError
 
-    def on_nav_scroll_top(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_scroll_top(self) -> None:
         raise NotImplementedError
 
-    def on_nav_scroll_bottom(self: 'EngineNavigationCallbacks') -> None:
+    def on_nav_scroll_bottom(self) -> None:
         raise NotImplementedError
 
 
@@ -471,7 +471,7 @@ class EngineNavigationCallbacks:
 
 class EngineHelpCallbacks:
 
-    def on_help_about(self: 'EngineHelpCallbacks') -> None:
+    def on_help_about(self) -> None:
         raise NotImplementedError
 
 
@@ -479,55 +479,55 @@ class EngineHelpCallbacks:
 
 class EngineSetCallbacks:
 
-    def on_set_chars_visible(self: 'EngineSetCallbacks', visible: bool) -> None:
+    def on_set_chars_visible(self, visible: bool) -> None:
         raise NotImplementedError
 
-    def on_set_line_length(self: 'EngineSetCallbacks', line_length: CellCoord) -> None:
+    def on_set_line_length(self, line_length: CellCoord) -> None:
         raise NotImplementedError
 
-    def on_set_chars_encoding(self: 'EngineSetCallbacks', encoding: str) -> None:
+    def on_set_chars_encoding(self, encoding: str) -> None:
         raise NotImplementedError
 
-    def on_set_cell_mode(self: 'EngineSetCallbacks', mode: ValueFormatEnum) -> None:
+    def on_set_cell_mode(self, mode: ValueFormatEnum) -> None:
         raise NotImplementedError
 
-    def on_set_cell_prefix(self: 'EngineSetCallbacks', prefix: bool) -> None:
+    def on_set_cell_prefix(self, prefix: bool) -> None:
         raise NotImplementedError
 
-    def on_set_cell_suffix(self: 'EngineSetCallbacks', suffix: bool) -> None:
+    def on_set_cell_suffix(self, suffix: bool) -> None:
         raise NotImplementedError
 
-    def on_set_cell_zeroed(self: 'EngineSetCallbacks', zeroed: bool) -> None:
+    def on_set_cell_zeroed(self, zeroed: bool) -> None:
         raise NotImplementedError
 
-    def on_set_address_mode(self: 'EngineSetCallbacks', mode: ValueFormatEnum) -> None:
+    def on_set_address_mode(self, mode: ValueFormatEnum) -> None:
         raise NotImplementedError
 
-    def on_set_address_prefix(self: 'EngineSetCallbacks', prefix: bool) -> None:
+    def on_set_address_prefix(self, prefix: bool) -> None:
         raise NotImplementedError
 
-    def on_set_address_suffix(self: 'EngineSetCallbacks', suffix: bool) -> None:
+    def on_set_address_suffix(self, suffix: bool) -> None:
         raise NotImplementedError
 
-    def on_set_address_zeroed(self: 'EngineSetCallbacks', zeroed: bool) -> None:
+    def on_set_address_zeroed(self, zeroed: bool) -> None:
         raise NotImplementedError
 
-    def on_set_address_skip(self: 'EngineSetCallbacks', skip: Address) -> None:
+    def on_set_address_skip(self, skip: Address) -> None:
         raise NotImplementedError
 
-    def on_set_address_bits(self: 'EngineSetCallbacks', bitsize: int) -> None:
+    def on_set_address_bits(self, bitsize: int) -> None:
         raise NotImplementedError
 
-    def on_set_offset_mode(self: 'EngineSetCallbacks', mode: ValueFormatEnum) -> None:
+    def on_set_offset_mode(self, mode: ValueFormatEnum) -> None:
         raise NotImplementedError
 
-    def on_set_offset_prefix(self: 'EngineSetCallbacks', prefix: bool) -> None:
+    def on_set_offset_prefix(self, prefix: bool) -> None:
         raise NotImplementedError
 
-    def on_set_offset_suffix(self: 'EngineSetCallbacks', suffix: bool) -> None:
+    def on_set_offset_suffix(self, suffix: bool) -> None:
         raise NotImplementedError
 
-    def on_set_offset_zeroed(self: 'EngineSetCallbacks', zeroed: bool) -> None:
+    def on_set_offset_zeroed(self, zeroed: bool) -> None:
         raise NotImplementedError
 
 
@@ -535,158 +535,158 @@ class EngineSetCallbacks:
 
 class EngineEditorCallbacks:
 
-    def on_key_digit_cells(self: 'EngineEditorCallbacks', digit: Value):
+    def on_key_digit_cells(self, digit: Value):
         raise NotImplementedError
 
-    def on_key_digit_chars(self: 'EngineEditorCallbacks', digit: Value):
+    def on_key_digit_chars(self, digit: Value):
         raise NotImplementedError
 
-    def on_key_reserve_cell(self: 'EngineEditorCallbacks'):
+    def on_key_reserve_cell(self):
         raise NotImplementedError
 
-    def on_key_delete_cell(self: 'EngineEditorCallbacks'):
+    def on_key_delete_cell(self):
         raise NotImplementedError
 
-    def on_key_clear_cell(self: 'EngineEditorCallbacks'):
+    def on_key_clear_cell(self):
         raise NotImplementedError
 
-    def on_key_clear_back(self: 'EngineEditorCallbacks'):
+    def on_key_clear_back(self):
         raise NotImplementedError
 
-    def on_key_clear_next(self: 'EngineEditorCallbacks'):
+    def on_key_clear_next(self):
         raise NotImplementedError
 
-    def on_key_delete(self: 'EngineEditorCallbacks'):
+    def on_key_delete(self):
         raise NotImplementedError
 
-    def on_key_fill(self: 'EngineEditorCallbacks'):
+    def on_key_fill(self):
         raise NotImplementedError
 
-    def on_key_flood(self: 'EngineEditorCallbacks'):
+    def on_key_flood(self):
         raise NotImplementedError
 
-    def on_key_cut(self: 'EngineEditorCallbacks'):
+    def on_key_cut(self):
         raise NotImplementedError
 
-    def on_key_copy(self: 'EngineEditorCallbacks'):
+    def on_key_copy(self):
         raise NotImplementedError
 
-    def on_key_paste(self: 'EngineEditorCallbacks'):
+    def on_key_paste(self):
         raise NotImplementedError
 
-    def on_key_crop(self: 'EngineEditorCallbacks'):
+    def on_key_crop(self):
         raise NotImplementedError
 
-    def on_key_move_focus(self: 'EngineEditorCallbacks'):
+    def on_key_move_focus(self):
         raise NotImplementedError
 
-    def on_key_move_apply(self: 'EngineEditorCallbacks'):
+    def on_key_move_apply(self):
         raise NotImplementedError
 
-    def on_key_scroll_line_up(self: 'EngineEditorCallbacks'):
+    def on_key_scroll_line_up(self):
         raise NotImplementedError
 
-    def on_key_scroll_page_up(self: 'EngineEditorCallbacks'):
+    def on_key_scroll_page_up(self):
         raise NotImplementedError
 
-    def on_key_scroll_line_down(self: 'EngineEditorCallbacks'):
+    def on_key_scroll_line_down(self):
         raise NotImplementedError
 
-    def on_key_scroll_page_down(self: 'EngineEditorCallbacks'):
+    def on_key_scroll_page_down(self):
         raise NotImplementedError
 
-    def on_key_scroll_top(self: 'EngineEditorCallbacks'):
+    def on_key_scroll_top(self):
         raise NotImplementedError
 
-    def on_key_scroll_bottom(self: 'EngineEditorCallbacks'):
+    def on_key_scroll_bottom(self):
         raise NotImplementedError
 
-    def on_key_move_left_digit(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_left_digit(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_move_right_digit(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_right_digit(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_move_left_byte(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_left_byte(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_move_right_byte(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_right_byte(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_move_line_up(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_line_up(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_move_page_up(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_page_up(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_move_line_down(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_line_down(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_move_page_down(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_move_page_down(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_line_start(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_line_start(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_line_endin(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_line_endin(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_memory_apply(self: 'EngineEditorCallbacks'):
+    def on_key_goto_memory_apply(self):
         raise NotImplementedError
 
-    def on_key_goto_memory_focus(self: 'EngineEditorCallbacks'):
+    def on_key_goto_memory_focus(self):
         raise NotImplementedError
 
-    def on_key_goto_memory_start(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_memory_start(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_memory_endin(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_memory_endin(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_memory_endex(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_memory_endex(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_block_previous(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_block_previous(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_block_next(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_block_next(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_block_start(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_block_start(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_goto_block_endin(self: 'EngineEditorCallbacks', selecting: bool = False):
+    def on_key_goto_block_endin(self, selecting: bool = False):
         raise NotImplementedError
 
-    def on_key_copy_address(self: 'EngineEditorCallbacks'):
+    def on_key_copy_address(self):
         raise NotImplementedError
 
-    def on_key_set_address(self: 'EngineEditorCallbacks'):
+    def on_key_set_address(self):
         raise NotImplementedError
 
-    def on_key_select_all(self: 'EngineEditorCallbacks'):
+    def on_key_select_all(self):
         raise NotImplementedError
 
-    def on_key_select_range(self: 'EngineEditorCallbacks'):
+    def on_key_select_range(self):
         raise NotImplementedError
 
-    def on_key_escape_selection(self: 'EngineEditorCallbacks'):
+    def on_key_escape_selection(self):
         raise NotImplementedError
 
-    def on_key_switch_cursor_mode(self: 'EngineEditorCallbacks'):
+    def on_key_switch_cursor_mode(self):
         raise NotImplementedError
 
-    def on_key_redraw(self: 'EngineEditorCallbacks'):
+    def on_key_redraw(self):
         raise NotImplementedError
 
-    def on_key_undo(self: 'EngineEditorCallbacks'):
+    def on_key_undo(self):
         raise NotImplementedError
 
-    def on_key_redo(self: 'EngineEditorCallbacks'):
+    def on_key_redo(self):
         raise NotImplementedError
 
     def on_cells_selection_press(
-        self: 'EngineEditorCallbacks',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -694,7 +694,7 @@ class EngineEditorCallbacks:
         raise NotImplementedError
 
     def on_cells_selection_double(
-        self: 'EngineEditorCallbacks',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -702,7 +702,7 @@ class EngineEditorCallbacks:
         raise NotImplementedError
 
     def on_cells_selection_motion(
-        self: 'EngineEditorCallbacks',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -710,7 +710,7 @@ class EngineEditorCallbacks:
         raise NotImplementedError
 
     def on_cells_selection_release(
-        self: 'EngineEditorCallbacks',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -718,28 +718,28 @@ class EngineEditorCallbacks:
         raise NotImplementedError
 
     def on_chars_selection_press(
-        self: 'EngineEditorCallbacks',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
         raise NotImplementedError
 
     def on_chars_selection_double(
-        self: 'EngineEditorCallbacks',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
         raise NotImplementedError
 
     def on_chars_selection_motion(
-        self: 'EngineEditorCallbacks',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
         raise NotImplementedError
 
     def on_chars_selection_release(
-        self: 'EngineEditorCallbacks',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
@@ -758,7 +758,7 @@ class BaseEngine(
     EngineEditorCallbacks,
 ):
     def __init__(
-        self: 'BaseEngine',
+        self,
         ui: 'BaseUserInterface' = None,
         status: Optional[EngineStatus] = None,
     ):
@@ -905,17 +905,17 @@ class BaseEngine(
 class BaseMemento:
 
     def __init__(
-        self: 'BaseMemento',
+        self,
         engine: BaseEngine,
         status: EngineStatus,
     ):
         self._engine: BaseEngine = engine
         self._status: EngineStatus = status
 
-    def redo(self: 'BaseMemento') -> None:
+    def redo(self) -> None:
         raise NotImplementedError
 
-    def undo(self: 'BaseMemento') -> None:
+    def undo(self) -> None:
         raise NotImplementedError
 
 
@@ -923,7 +923,7 @@ class BaseMemento:
 
 class BaseEditorWidget:
 
-    def __init__(self: 'BaseEditorWidget'):
+    def __init__(self):
         self._address_start: Address = 0  # dummy
         self._address_endex: Address = 0  # dummy
 
@@ -1054,7 +1054,7 @@ class BaseEditorWidget:
 class BaseUserInterface:
 
     def __init__(
-        self: 'BaseUserInterface',
+        self,
         manager: 'BaseInstanceManager',
     ):
         self._manager: 'BaseInstanceManager' = manager

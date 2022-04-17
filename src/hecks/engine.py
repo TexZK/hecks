@@ -59,7 +59,7 @@ def _todo():  # TODO remove all of its calls
 class Engine(BaseEngine):
 
     def __init__(
-        self: 'Engine',
+        self,
         ui: BaseUserInterface = None,
         status: Optional[EngineStatus] = None,
     ):
@@ -798,7 +798,7 @@ class Engine(BaseEngine):
             self._move_cursor_by_char(+1, 0)
         self._update_selection(selecting)
 
-    def on_file_new(self: 'Engine') -> None:
+    def on_file_new(self) -> None:
         self.ui.create_new()
 
     def _file_load(self, file_path: str) -> Memory:
@@ -814,7 +814,7 @@ class Engine(BaseEngine):
             memory = Memory.from_blocks(blocks)
         return memory
 
-    def on_file_open(self: 'Engine') -> None:
+    def on_file_open(self) -> None:
         file_path = self.ui.ask_open_file_path()
         if file_path:
             memory = self._file_load(file_path)
@@ -828,7 +828,7 @@ class Engine(BaseEngine):
             self.ui.editor.scroll_top()
             self.ui.editor.focus_set()
 
-    def on_file_import(self: 'Engine') -> None:
+    def on_file_import(self) -> None:
         file_path = self.ui.ask_open_file_path()
         if file_path:
             memory = self._file_load(file_path)
@@ -851,7 +851,7 @@ class Engine(BaseEngine):
         else:
             _hr.save_blocks(file_path, memory._blocks, record_type=record_type)
 
-    def on_file_save(self: 'Engine') -> None:
+    def on_file_save(self) -> None:
         status = self.status
 
         if status.file_path:
@@ -860,7 +860,7 @@ class Engine(BaseEngine):
         else:
             self.on_file_save_as()
 
-    def on_file_save_as(self: 'Engine') -> None:
+    def on_file_save_as(self) -> None:
         file_path = self.ui.ask_save_file_path()
         if file_path:
             self._file_save(file_path, self.status.memory)
@@ -869,57 +869,57 @@ class Engine(BaseEngine):
             status.file_path = file_path
             self.ui.update_title_by_file_path()
 
-    def on_file_settings(self: 'Engine') -> None:
+    def on_file_settings(self) -> None:
         _todo()  # TODO
 
-    def on_file_exit(self: 'Engine') -> None:
+    def on_file_exit(self) -> None:
         # TODO: check for changes and ask for confirmation
         self.ui.quit()
 
-    def on_edit_undo(self: 'Engine') -> None:
+    def on_edit_undo(self) -> None:
         self.on_key_undo()
 
-    def on_edit_redo(self: 'Engine') -> None:
+    def on_edit_redo(self) -> None:
         self.on_key_redo()
 
-    def on_edit_cut(self: 'Engine') -> None:
+    def on_edit_cut(self) -> None:
         self.copy_selection()
         self.delete_selection()
 
-    def on_edit_copy(self: 'Engine') -> None:
+    def on_edit_copy(self) -> None:
         self.copy_selection()
 
-    def on_edit_paste(self: 'Engine') -> None:
+    def on_edit_paste(self) -> None:
         self.paste_selection()
 
-    def on_edit_delete(self: 'Engine') -> None:
+    def on_edit_delete(self) -> None:
         self.delete_cell()
 
-    def on_edit_cursor_mode(self: 'Engine') -> None:
+    def on_edit_cursor_mode(self) -> None:
         self.switch_cursor_mode()
 
-    def on_edit_clear(self: 'Engine') -> None:
+    def on_edit_clear(self) -> None:
         self.clear_cell()
 
-    def on_edit_reserve(self: 'Engine') -> None:
+    def on_edit_reserve(self) -> None:
         self.reserve_cell()
 
-    def on_edit_fill(self: 'Engine') -> None:
+    def on_edit_fill(self) -> None:
         self.on_key_fill()
 
-    def on_edit_flood(self: 'Engine') -> None:
+    def on_edit_flood(self) -> None:
         self.on_key_flood()
 
-    def on_edit_crop(self: 'Engine') -> None:
+    def on_edit_crop(self) -> None:
         self.crop_selection()
 
-    def on_edit_move_focus(self: 'Engine') -> None:
+    def on_edit_move_focus(self) -> None:
         self.on_nav_goto_memory_address_start_focus()
 
-    def on_edit_move_apply(self: 'Engine') -> None:
+    def on_edit_move_apply(self) -> None:
         _todo()  # TODO
 
-    def on_edit_export(self: 'Engine') -> None:
+    def on_edit_export(self) -> None:
         status = self.status
         path = self.ui.ask_save_file_path()
         if path and status.sel_mode:
@@ -930,38 +930,38 @@ class Engine(BaseEngine):
             memory = status.memory.extract(start, endin + 1)
             _hr.save_blocks(path, memory._blocks)
 
-    def on_edit_select_all(self: 'Engine') -> None:
+    def on_edit_select_all(self) -> None:
         self.select_all()
 
-    def on_edit_select_range(self: 'Engine') -> None:
+    def on_edit_select_range(self) -> None:
         self.on_nav_goto_memory_address_endin_apply()
 
-    def on_edit_copy_address(self: 'Engine') -> None:
+    def on_edit_copy_address(self) -> None:
         self.copy_cursor_address()
 
-    def on_edit_find(self: 'Engine') -> None:
+    def on_edit_find(self) -> None:
         _todo()  # TODO
 
-    def on_view_line_length_custom(self: 'Engine') -> None:
+    def on_view_line_length_custom(self) -> None:
         self.ui.ask_line_length_custom()
 
-    def on_view_address_bits_custom(self: 'Engine') -> None:
+    def on_view_address_bits_custom(self) -> None:
         self.ui.ask_address_bits_custom()
 
-    def on_view_chars_encoding_custom(self: 'Engine') -> None:
+    def on_view_chars_encoding_custom(self) -> None:
         self.ui.ask_chars_encoding_custom()
 
-    def on_view_redraw(self: 'Engine') -> None:
+    def on_view_redraw(self) -> None:
         self.ui.editor.redraw()
         self.ui.update_status()
 
-    def on_nav_editor_focus(self: 'Engine') -> None:
+    def on_nav_editor_focus(self) -> None:
         self.ui.editor.focus_set()
 
-    def on_nav_goto_memory_address_start_focus(self: 'Engine') -> None:
+    def on_nav_goto_memory_address_start_focus(self) -> None:
         self.ui.focus_start_text()
 
-    def on_nav_goto_memory_address_start_apply(self: 'Engine') -> None:
+    def on_nav_goto_memory_address_start_apply(self) -> None:
         ui = self.ui
         try:
             address = ui.get_start_address()
@@ -971,10 +971,10 @@ class Engine(BaseEngine):
             self.goto_memory_absolute(address)
             ui.editor.focus_set()
 
-    def on_nav_goto_memory_address_endin_focus(self: 'Engine') -> None:
+    def on_nav_goto_memory_address_endin_focus(self) -> None:
         self.ui.focus_endin_text()
 
-    def on_nav_goto_memory_address_endin_apply(self: 'Engine') -> None:
+    def on_nav_goto_memory_address_endin_apply(self) -> None:
         ui = self.ui
         try:
             start_address = ui.get_start_address()
@@ -993,7 +993,7 @@ class Engine(BaseEngine):
         self.select_range(start_address, endin_address + 1)
         ui.editor.focus_set()
 
-    def on_nav_goto_memory_address_copy(self: 'Engine') -> None:
+    def on_nav_goto_memory_address_copy(self) -> None:
         status = self.status
         ui = self.ui
 
@@ -1010,165 +1010,165 @@ class Engine(BaseEngine):
 
         ui.editor.focus_set()
 
-    def on_nav_goto_memory_start(self: 'Engine') -> None:
+    def on_nav_goto_memory_start(self) -> None:
         self.goto_memory_start()
 
-    def on_nav_goto_memory_endin(self: 'Engine') -> None:
+    def on_nav_goto_memory_endin(self) -> None:
         self.goto_memory_endin()
 
-    def on_nav_goto_memory_endex(self: 'Engine') -> None:
+    def on_nav_goto_memory_endex(self) -> None:
         self.goto_memory_endex()
 
-    def on_nav_address_skip(self: 'Engine') -> None:
+    def on_nav_address_skip(self) -> None:
         self.ui.ask_address_skip_custom()
 
-    def on_nav_goto_block_previous(self: 'Engine') -> None:
+    def on_nav_goto_block_previous(self) -> None:
         self.on_key_goto_block_previous()
 
-    def on_nav_goto_block_next(self: 'Engine') -> None:
+    def on_nav_goto_block_next(self) -> None:
         self.on_key_goto_block_next()
 
-    def on_nav_goto_block_start(self: 'Engine') -> None:
+    def on_nav_goto_block_start(self) -> None:
         self.on_key_goto_block_start()
 
-    def on_nav_goto_block_endin(self: 'Engine') -> None:
+    def on_nav_goto_block_endin(self) -> None:
         self.on_key_goto_block_endin()
 
-    def on_nav_goto_byte_previous(self: 'Engine') -> None:
+    def on_nav_goto_byte_previous(self) -> None:
         self.on_key_move_left_byte()
 
-    def on_nav_goto_byte_next(self: 'Engine') -> None:
+    def on_nav_goto_byte_next(self) -> None:
         self.on_key_move_right_byte()
 
-    def on_nav_goto_line_start(self: 'Engine') -> None:
+    def on_nav_goto_line_start(self) -> None:
         self.goto_line_start()
 
-    def on_nav_goto_line_endin(self: 'Engine') -> None:
+    def on_nav_goto_line_endin(self) -> None:
         self.goto_line_endin()
 
-    def on_nav_scroll_line_up(self: 'Engine') -> None:
+    def on_nav_scroll_line_up(self) -> None:
         self.ui.editor.scroll_up()
 
-    def on_nav_scroll_line_down(self: 'Engine') -> None:
+    def on_nav_scroll_line_down(self) -> None:
         self.ui.editor.scroll_down()
 
-    def on_nav_scroll_page_up(self: 'Engine') -> None:
+    def on_nav_scroll_page_up(self) -> None:
         self.ui.editor.scroll_page_up()
 
-    def on_nav_scroll_page_down(self: 'Engine') -> None:
+    def on_nav_scroll_page_down(self) -> None:
         self.ui.editor.scroll_page_down()
 
-    def on_nav_scroll_top(self: 'Engine') -> None:
+    def on_nav_scroll_top(self) -> None:
         self.ui.editor.scroll_top()
 
-    def on_nav_scroll_bottom(self: 'Engine') -> None:
+    def on_nav_scroll_bottom(self) -> None:
         self.ui.editor.scroll_bottom()
 
-    def on_help_about(self: 'Engine') -> None:
+    def on_help_about(self) -> None:
         self.ui.show_about()
 
-    def on_set_chars_visible(self: 'Engine', visible: bool) -> None:
+    def on_set_chars_visible(self, visible: bool) -> None:
         self.ui.editor.chars_visible = visible
 
-    def on_set_line_length(self: 'Engine', line_length: CellCoord) -> None:
+    def on_set_line_length(self, line_length: CellCoord) -> None:
         status = self.status
         status.line_length = line_length
         self.goto_memory_absolute(status.cursor_address)
 
-    def on_set_chars_encoding(self: 'Engine', encoding: str) -> None:
+    def on_set_chars_encoding(self, encoding: str) -> None:
         status = self.status
         status.chars_encoding = encoding
         status.chars_table = build_encoding_table(encoding)
         self.on_view_redraw()
 
-    def on_set_cell_mode(self: 'Engine', mode: ValueFormatEnum) -> None:
+    def on_set_cell_mode(self, mode: ValueFormatEnum) -> None:
         status = self.status
         status.cell_format_mode = ValueFormatEnum(mode)
         status.update_cell_format()
         self.on_view_redraw()
 
-    def on_set_cell_prefix(self: 'Engine', prefix: bool) -> None:
+    def on_set_cell_prefix(self, prefix: bool) -> None:
         status = self.status
         status.cell_format_prefix = bool(prefix)
         status.update_cell_format()
         self.on_view_redraw()
 
-    def on_set_cell_suffix(self: 'Engine', suffix: bool) -> None:
+    def on_set_cell_suffix(self, suffix: bool) -> None:
         status = self.status
         status.cell_format_suffix = bool(suffix)
         status.update_cell_format()
         self.on_view_redraw()
 
-    def on_set_cell_zeroed(self: 'Engine', zeroed: bool) -> None:
+    def on_set_cell_zeroed(self, zeroed: bool) -> None:
         status = self.status
         status.cell_format_zeroed = bool(zeroed)
         status.update_cell_format()
         self.on_view_redraw()
 
-    def on_set_address_mode(self: 'Engine', mode: ValueFormatEnum) -> None:
+    def on_set_address_mode(self, mode: ValueFormatEnum) -> None:
         status = self.status
         status.address_format_mode = ValueFormatEnum(mode)
         status.update_address_format()
         self.on_view_redraw()
 
-    def on_set_address_prefix(self: 'Engine', prefix: bool) -> None:
+    def on_set_address_prefix(self, prefix: bool) -> None:
         status = self.status
         status.address_format_prefix = bool(prefix)
         status.update_address_format()
         self.on_view_redraw()
 
-    def on_set_address_suffix(self: 'Engine', suffix: bool) -> None:
+    def on_set_address_suffix(self, suffix: bool) -> None:
         status = self.status
         status.address_format_suffix = bool(suffix)
         status.update_address_format()
         self.on_view_redraw()
 
-    def on_set_address_zeroed(self: 'Engine', zeroed: bool) -> None:
+    def on_set_address_zeroed(self, zeroed: bool) -> None:
         status = self.status
         status.address_format_zeroed = bool(zeroed)
         status.update_address_format()
         self.on_view_redraw()
 
-    def on_set_address_skip(self: 'Engine', skip: Address) -> None:
+    def on_set_address_skip(self, skip: Address) -> None:
         status = self.status
         status.address_skip = skip
         self.on_view_redraw()
 
-    def on_set_address_bits(self: 'Engine', bitsize: int) -> None:
+    def on_set_address_bits(self, bitsize: int) -> None:
         status = self.status
         status.address_bits = bitsize
         status.update_address_format()
         self.on_view_redraw()
 
-    def on_set_offset_mode(self: 'Engine', mode: ValueFormatEnum) -> None:
+    def on_set_offset_mode(self, mode: ValueFormatEnum) -> None:
         status = self.status
         status.offset_format_mode = ValueFormatEnum(mode)
         status.update_offset_format()
         self.on_view_redraw()
 
-    def on_set_offset_prefix(self: 'Engine', prefix: bool) -> None:
+    def on_set_offset_prefix(self, prefix: bool) -> None:
         status = self.status
         status.offset_format_prefix = bool(prefix)
         status.update_offset_format()
         self.on_view_redraw()
 
-    def on_set_offset_suffix(self: 'Engine', suffix: bool) -> None:
+    def on_set_offset_suffix(self, suffix: bool) -> None:
         status = self.status
         status.offset_format_suffix = bool(suffix)
         status.update_offset_format()
         self.on_view_redraw()
 
-    def on_set_offset_zeroed(self: 'Engine', zeroed: bool) -> None:
+    def on_set_offset_zeroed(self, zeroed: bool) -> None:
         status = self.status
         status.offset_format_zeroed = bool(zeroed)
         status.update_offset_format()
         self.on_view_redraw()
 
-    def on_key_digit_cells(self: 'Engine', digit_char: str):
+    def on_key_digit_cells(self, digit_char: str):
         insert = (self.status.cursor_mode == CursorMode.INSERT)
         self.write_digit(digit_char, insert=insert)
 
-    def on_key_digit_chars(self: 'Engine', digit_char: str):
+    def on_key_digit_chars(self, digit_char: str):
         try:
             value = self.status.chars_table.index(digit_char)
         except ValueError:
@@ -1177,16 +1177,16 @@ class Engine(BaseEngine):
             insert = (self.status.cursor_mode == CursorMode.INSERT)
             self.write_byte(value, insert=insert)
 
-    def on_key_reserve_cell(self: 'Engine'):
+    def on_key_reserve_cell(self):
         self.reserve_cell()
 
-    def on_key_delete_cell(self: 'Engine'):
+    def on_key_delete_cell(self):
         self.delete_cell()
 
-    def on_key_clear_cell(self: 'Engine'):
+    def on_key_clear_cell(self):
         self.clear_cell()
 
-    def on_key_clear_back(self: 'Engine'):
+    def on_key_clear_back(self):
         if self.status.cursor_mode == CursorMode.INSERT:
             self.move_left(whole_byte=True)
             self.delete_cell()
@@ -1196,19 +1196,19 @@ class Engine(BaseEngine):
             if not sel_mode:
                 self.move_left(whole_byte=True)
 
-    def on_key_clear_next(self: 'Engine'):
+    def on_key_clear_next(self):
         sel_mode = self.status.sel_mode
         self.clear_cell()
         if not sel_mode:
             self.move_right(whole_byte=True)
 
-    def on_key_delete(self: 'Engine'):
+    def on_key_delete(self):
         if self.status.cursor_mode == CursorMode.INSERT:
             self.delete_cell()
         else:
             self.on_key_clear_next()
 
-    def on_key_fill(self: 'Engine'):
+    def on_key_fill(self):
         # FIXME: ask to view/widget
         answer = tkinter.simpledialog.askstring('Fill value', 'Insert the fill value')
         if answer:
@@ -1219,7 +1219,7 @@ class Engine(BaseEngine):
                 tkinter.messagebox.showerror('Invalid format', f'Invalid value format:\n\n{answer}')
         self.ui.editor.focus_set()
 
-    def on_key_flood(self: 'Engine'):
+    def on_key_flood(self):
         status = self.status
         if status.memory.peek(status.cursor_address) is None or status.sel_mode:
             # FIXME: ask to view/widget
@@ -1232,131 +1232,131 @@ class Engine(BaseEngine):
                     tkinter.messagebox.showerror('Invalid format', f'Invalid value format:\n\n{answer}')
             self.ui.editor.focus_set()
 
-    def on_key_cut(self: 'Engine'):
+    def on_key_cut(self):
         self.cut_selection()
 
-    def on_key_copy(self: 'Engine'):
+    def on_key_copy(self):
         self.copy_selection()
 
-    def on_key_paste(self: 'Engine'):
+    def on_key_paste(self):
         self.paste_selection()
 
-    def on_key_crop(self: 'Engine'):
+    def on_key_crop(self):
         self.crop_selection()
 
-    def on_key_move_focus(self: 'Engine'):
+    def on_key_move_focus(self):
         self.on_nav_goto_memory_address_start_focus()
 
-    def on_key_move_apply(self: 'Engine'):
+    def on_key_move_apply(self):
         # TODO: read from toolbar
         self.ui.editor.focus_set()
 
-    def on_key_scroll_line_up(self: 'Engine'):
+    def on_key_scroll_line_up(self):
         self.ui.editor.scroll_up()
 
-    def on_key_scroll_page_up(self: 'Engine'):
+    def on_key_scroll_page_up(self):
         self.ui.editor.scroll_page_up()
 
-    def on_key_scroll_line_down(self: 'Engine'):
+    def on_key_scroll_line_down(self):
         self.ui.editor.scroll_down()
 
-    def on_key_scroll_page_down(self: 'Engine'):
+    def on_key_scroll_page_down(self):
         self.ui.editor.scroll_page_down()
 
-    def on_key_scroll_top(self: 'Engine'):
+    def on_key_scroll_top(self):
         self.ui.editor.scroll_top()
 
-    def on_key_scroll_bottom(self: 'Engine'):
+    def on_key_scroll_bottom(self):
         self.ui.editor.scroll_bottom()
 
-    def on_key_move_left_digit(self: 'Engine', selecting: bool = False):
+    def on_key_move_left_digit(self, selecting: bool = False):
         self.move_left(whole_byte=selecting, selecting=selecting)
 
-    def on_key_move_right_digit(self: 'Engine', selecting: bool = False):
+    def on_key_move_right_digit(self, selecting: bool = False):
         self.move_right(whole_byte=selecting, selecting=selecting)
 
-    def on_key_move_left_byte(self: 'Engine', selecting: bool = False):
+    def on_key_move_left_byte(self, selecting: bool = False):
         self.move_left(whole_byte=True, selecting=selecting)
 
-    def on_key_move_right_byte(self: 'Engine', selecting: bool = False):
+    def on_key_move_right_byte(self, selecting: bool = False):
         self.move_right(whole_byte=True, selecting=selecting)
 
-    def on_key_move_line_up(self: 'Engine', selecting: bool = False):
+    def on_key_move_line_up(self, selecting: bool = False):
         self.move_up(selecting=selecting)
 
-    def on_key_move_page_up(self: 'Engine', selecting: bool = False):
+    def on_key_move_page_up(self, selecting: bool = False):
         self.move_page_up(selecting=selecting)
 
-    def on_key_move_line_down(self: 'Engine', selecting: bool = False):
+    def on_key_move_line_down(self, selecting: bool = False):
         self.move_down(selecting=selecting)
 
-    def on_key_move_page_down(self: 'Engine', selecting: bool = False):
+    def on_key_move_page_down(self, selecting: bool = False):
         self.move_page_down(selecting=selecting)
 
-    def on_key_goto_line_start(self: 'Engine', selecting: bool = False):
+    def on_key_goto_line_start(self, selecting: bool = False):
         self.goto_line_start(selecting=selecting)
 
-    def on_key_goto_line_endin(self: 'Engine', selecting: bool = False):
+    def on_key_goto_line_endin(self, selecting: bool = False):
         self.goto_line_endin(selecting=selecting)
 
-    def on_key_goto_memory_apply(self: 'Engine'):
+    def on_key_goto_memory_apply(self):
         self.escape_selection()
         # TODO: read from toolbar
         self.ui.editor.focus_set()
 
-    def on_key_goto_memory_focus(self: 'Engine'):
+    def on_key_goto_memory_focus(self):
         self.on_nav_goto_memory_address_start_focus()
 
-    def on_key_goto_memory_start(self: 'Engine', selecting: bool = False):
+    def on_key_goto_memory_start(self, selecting: bool = False):
         self.goto_memory_start(selecting=selecting)
 
-    def on_key_goto_memory_endin(self: 'Engine', selecting: bool = False):
+    def on_key_goto_memory_endin(self, selecting: bool = False):
         self.goto_memory_endin(selecting=selecting)
 
-    def on_key_goto_memory_endex(self: 'Engine', selecting: bool = False):
+    def on_key_goto_memory_endex(self, selecting: bool = False):
         self.goto_memory_endex(selecting=selecting)
 
-    def on_key_goto_block_previous(self: 'Engine', selecting: bool = False):
+    def on_key_goto_block_previous(self, selecting: bool = False):
         self.goto_block_previous(selecting=selecting)
 
-    def on_key_goto_block_next(self: 'Engine', selecting: bool = False):
+    def on_key_goto_block_next(self, selecting: bool = False):
         self.goto_block_next(selecting=selecting)
 
-    def on_key_goto_block_start(self: 'Engine', selecting: bool = False):
+    def on_key_goto_block_start(self, selecting: bool = False):
         self.goto_block_start(selecting=selecting)
 
-    def on_key_goto_block_endin(self: 'Engine', selecting: bool = False):
+    def on_key_goto_block_endin(self, selecting: bool = False):
         self.goto_block_endin(selecting=selecting)
 
-    def on_key_copy_address(self: 'Engine'):
+    def on_key_copy_address(self):
         self.copy_cursor_address()
 
-    def on_key_set_address(self: 'Engine'):
+    def on_key_set_address(self):
         self.on_nav_goto_memory_address_copy()
 
-    def on_key_select_all(self: 'Engine'):
+    def on_key_select_all(self):
         self.select_all()
 
-    def on_key_select_range(self: 'Engine'):
+    def on_key_select_range(self):
         _todo()  # TODO: focus toolbar
 
-    def on_key_escape_selection(self: 'Engine'):
+    def on_key_escape_selection(self):
         self.escape_selection()
 
-    def on_key_switch_cursor_mode(self: 'Engine'):
+    def on_key_switch_cursor_mode(self):
         self.switch_cursor_mode()
 
-    def on_key_redraw(self: 'Engine'):
+    def on_key_redraw(self):
         self.ui.editor.redraw()
 
-    def on_key_undo(self: 'Engine'):
+    def on_key_undo(self):
         _todo()  # TODO
 
-    def on_key_redo(self: 'Engine'):
+    def on_key_redo(self):
         _todo()  # TODO
 
     def on_cells_selection_press(
-        self: 'Engine',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -1368,7 +1368,7 @@ class Engine(BaseEngine):
         widget.cells_canvas.focus_set()
 
     def on_cells_selection_double(
-        self: 'Engine',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -1378,7 +1378,7 @@ class Engine(BaseEngine):
         self.select_homogeneous(status.cursor_address)
 
     def on_cells_selection_motion(
-        self: 'Engine',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -1409,7 +1409,7 @@ class Engine(BaseEngine):
             widget.update_view(force_selection=True)
 
     def on_cells_selection_release(
-        self: 'Engine',
+        self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
@@ -1419,7 +1419,7 @@ class Engine(BaseEngine):
         widget.update_view(force_selection=True)
 
     def on_chars_selection_press(
-        self: 'Engine',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
@@ -1428,7 +1428,7 @@ class Engine(BaseEngine):
         self.ui.editor.chars_canvas.focus_set()
 
     def on_chars_selection_double(
-        self: 'Engine',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
@@ -1436,7 +1436,7 @@ class Engine(BaseEngine):
         self.select_homogeneous(self.status.cursor_address)
 
     def on_chars_selection_motion(
-        self: 'Engine',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
@@ -1466,7 +1466,7 @@ class Engine(BaseEngine):
             widget.update_view(force_selection=True)
 
     def on_chars_selection_release(
-        self: 'Engine',
+        self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
