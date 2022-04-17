@@ -50,7 +50,7 @@ from .common import SelectionMode
 from .utils import HEX_SET
 from .utils import ValueFormatEnum
 from .utils import parse_int
-from bytesparse._py import Address
+from bytesparse.base import Address
 
 
 # =====================================================================================================================

@@ -22,9 +22,9 @@ from typing import MutableMapping
 from typing import Optional
 from typing import Tuple
 
-from bytesparse._py import Address
-from bytesparse._py import Memory
-from bytesparse._py import Value
+from bytesparse.base import Address
+from bytesparse.base import Value
+from bytesparse.inplace import Memory
 
 from .utils import VALUE_FORMAT_CHAR
 from .utils import VALUE_FORMAT_PREFIX
@@ -142,7 +142,7 @@ class EngineStatus:
         # Initialize memory
         # XXX FIXME: allocate some dummy data for debug
         data = bytes(range(256)) * 8
-        self.memory = Memory(data=data, offset=0xDA7A0000)
+        self.memory = Memory.from_bytes(data, offset=0xDA7A0000)
 
         self.line_length: int = 16
         self.chars_encoding = 'ascii'

@@ -26,9 +26,9 @@ from typing import Optional
 from typing import Tuple
 from typing import cast as _cast
 
-from bytesparse._py import Address
-from bytesparse._py import Memory
-from bytesparse._py import Value
+from bytesparse.base import Address
+from bytesparse.base import Value
+from bytesparse.inplace import Memory
 import hexrec.blocks as _hb
 import hexrec.records as _hr
 import pyperclip
@@ -428,7 +428,7 @@ class Engine(BaseEngine):
                 for block_start, block_data in blocks:
                     target_address = address + block_start - start
                     status.memory.write(target_address, block_data)
-                    widget.mark_dirty_range(address)
+                    widget.mark_dirty_range(address, address + len(block_data))
 
             self.goto_memory_absolute(target_endex)
             widget.update_view(force_content=True)
@@ -807,11 +807,11 @@ class Engine(BaseEngine):
             record_type = _hr.find_record_type(file_path)
         except KeyError:
             with open(file_path, 'rb') as stream:
-                memory = stream.read()
-            memory = Memory(data=memory)
+                data = stream.read()
+            memory = Memory.from_bytes(data)
         else:
             blocks = _hr.load_blocks(file_path, record_type=record_type)
-            memory = Memory(blocks=blocks)
+            memory = Memory.from_blocks(blocks)
         return memory
 
     def on_file_open(self: 'Engine') -> None:

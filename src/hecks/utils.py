@@ -28,7 +28,7 @@ from typing import Sequence
 from typing import Tuple
 
 import hexrec.utils
-from bytesparse._py import Memory
+from bytesparse.inplace import Memory
 
 BIN_SET = set('01')
 OCT_SET = set('01234567')
