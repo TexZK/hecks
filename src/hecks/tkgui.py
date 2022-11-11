@@ -131,7 +131,7 @@ class Tooltip:
         self._bg: str = bg
         self._clearance_x = clearance_x
         self._clearance_y = clearance_y
-        self._tooltip: object = None
+        self._tooltip: Optional[tk.Toplevel] = None
 
         widget.focus_displayof()
         widget.bind('<Enter>', self._enter)
@@ -422,7 +422,7 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self._address_canvas: tk.Canvas = address_canvas
         self._address_canvas_w: int = address_canvas_w
 
-        self._addrs_text_id: MutableMapping[CellCoords, CanvasObject] = {}
+        self._addrs_text_id: MutableMapping[CellCoord, CanvasObject] = {}
 
     def __init_offset_bar(self):
         pad_x, pad_y = self._pad_x, self._pad_y
@@ -519,11 +519,11 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         color = 'SystemWindowText'
 
         self._cells_cursor_color: str = color
-        cells_cursor_id = self._cells_canvas.create_line(-2, -2, -1, -1, width=2, fill=color, tag='cursor')
+        cells_cursor_id = self._cells_canvas.create_line(-2, -2, -1, -1, width=2, fill=color, tags='cursor')
         self._cells_cursor_id: CanvasObject = cells_cursor_id
 
         self._chars_cursor_color: str = color
-        chars_cursor_id = self._chars_canvas.create_line(-2, -2, -1, -1, width=2, fill=color, tag='cursor')
+        chars_cursor_id = self._chars_canvas.create_line(-2, -2, -1, -1, width=2, fill=color, tags='cursor')
         self._chars_cursor_id: CanvasObject = chars_cursor_id
 
     def __init_bindings(self):
@@ -1282,20 +1282,20 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
 
             else:
                 cell_text_id = cells_canvas.create_text(cell_pixel_x, cell_pixel_y,
-                                                        anchor=tk.NW, font=font, tag='cell_text', text=cell_text)
+                                                        anchor=tk.NW, font=font, tags='cell_text', text=cell_text)
 
                 cell_rect_id = cells_canvas.create_rectangle(cell_pixel_x, cell_pixel_y,
                                                              cell_pixel_x + rect_w, cell_pixel_y + rect_h,
-                                                             tag='cell_rect', outline='', fill='SystemHighlight',
+                                                             tags='cell_rect', outline='', fill='SystemHighlight',
                                                              state=tk.HIDDEN)
 
                 if chars_visible:
                     char_text_id = chars_canvas.create_text(char_pixel_x, char_pixel_y,
-                                                            anchor=tk.NW, font=font, tag='char_text', text=char_text)
+                                                            anchor=tk.NW, font=font, tags='char_text', text=char_text)
 
                     char_rect_id = chars_canvas.create_rectangle(char_pixel_x, char_pixel_y,
                                                                  char_pixel_x + font_w, char_pixel_y + font_h,
-                                                                 tag='char_rect', outline='', fill='SystemHighlight',
+                                                                 tags='char_rect', outline='', fill='SystemHighlight',
                                                                  state=tk.HIDDEN)
 
             cells_text_id[x_y] = cell_text_id
@@ -2809,15 +2809,16 @@ class UserInterface(BaseUserInterface):
                 return value
         return None
 
-    def ask_chars_encoding_custom(self) -> Optional[int]:
+    def ask_chars_encoding_custom(self) -> Optional[str]:
         value = tkinter.simpledialog.askstring('Text encoding', 'Enter the Python text codec name:')
         if value is not None:
             try:
                 b'\0'.decode(encoding=value, errors='strict')
+            except UnicodeDecodeError:
+                tkinter.messagebox.showerror('Invalid encoding', f'Python does not support the text codec: {value!r}')
+            else:
                 self.chars_encoding_tkvar.set(value)
                 return value
-            except:
-                tkinter.messagebox.showerror('Invalid encoding', f'Python does not support the text codec: {value!r}')
         return None
 
     def update_title_by_file_path(self):
