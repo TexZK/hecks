@@ -82,6 +82,7 @@ class Engine(BaseEngine):
             if not status.sel_mode:
                 status.sel_mode = SelectionMode.NORMAL
                 self.ui.update_menus_by_selection()
+                self.ui.update_status()
 
             self._set_selection_endin(*status.cursor_cell)
             widget.update_view(force_selection=True)
@@ -101,6 +102,7 @@ class Engine(BaseEngine):
             status.sel_mode = SelectionMode.OFF
             widget.update_view(force_selection=True)
             self.ui.update_menus_by_selection()
+            self.ui.update_status()
 
     def select_homogeneous(self, address: Address) -> Tuple[Address, Address, Optional[Value]]:  # TODO: add menu command
         widget = self.ui.editor
@@ -113,6 +115,7 @@ class Engine(BaseEngine):
             self._set_selection_endin(*status.address_to_cell_coords(endex - 1))
             widget.update_view(force_selection=True)
             self.ui.update_menus_by_selection()
+            self.ui.update_status()
 
         return start, endex, value
 
@@ -129,6 +132,7 @@ class Engine(BaseEngine):
             if not status.sel_mode:
                 status.sel_mode = SelectionMode.NORMAL
                 self.ui.update_menus_by_selection()
+                self.ui.update_status()
 
             cell_start = status.address_to_cell_coords(start)
             cell_endin = status.address_to_cell_coords(endex - 1)
@@ -163,6 +167,7 @@ class Engine(BaseEngine):
             widget.mark_dirty_all()
             widget.update_view(force_content=True)
             self.ui.update_menus_by_selection()
+            self.ui.update_status()
 
     def shift_selection(self, offset: Address) -> None:
         if offset:
@@ -189,6 +194,7 @@ class Engine(BaseEngine):
                 widget.mark_dirty_range(min(start, origin))
                 widget.update_view(force_content=True)
                 self.ui.update_menus_by_selection()
+                self.ui.update_status()
 
             elif sel_mode == SelectionMode.RECTANGLE:
                 pass  # TODO
@@ -238,6 +244,7 @@ class Engine(BaseEngine):
         self._move_cursor_by_char(+1, 0)
         if value_before is None:
             self.ui.update_menus_by_selection()
+        self.ui.update_status()
         return True
 
     def write_byte(self, value: int, insert: bool = False) -> bool:
@@ -266,6 +273,7 @@ class Engine(BaseEngine):
         self._move_cursor_by_char(status.cell_format_length, 0)
         if value_before is None:
             self.ui.update_menus_by_selection()
+        self.ui.update_status()
         return True
 
     def reserve_cell(self) -> None:
@@ -280,6 +288,7 @@ class Engine(BaseEngine):
             widget.mark_dirty_range(address)
             widget.update_view(force_content=True)
             self.ui.update_menus_by_selection()
+        self.ui.update_status()
 
     def clear_cell(self) -> None:
         widget = self.ui.editor
@@ -294,6 +303,7 @@ class Engine(BaseEngine):
             widget.mark_dirty_cell(cell_x, cell_y)
             widget.update_view(force_content=True)
             self.ui.update_menus_by_selection()
+        self.ui.update_status()
 
     def delete_cell(self) -> None:
         widget = self.ui.editor
@@ -307,6 +317,7 @@ class Engine(BaseEngine):
             widget.mark_dirty_range(address)
             widget.update_view(force_content=True)
             self.ui.update_menus_by_selection()
+        self.ui.update_status()
 
     def _cleanup_selection(self, reserve: bool = False) -> None:
         widget = self.ui.editor
@@ -434,6 +445,7 @@ class Engine(BaseEngine):
             self.goto_memory_absolute(target_endex)
             widget.update_view(force_content=True)
             self.ui.update_menus_by_selection()
+            self.ui.update_status()
 
     def fill_selection(self, value: int):
         widget = self.ui.editor
@@ -465,6 +477,7 @@ class Engine(BaseEngine):
 
         widget.update_view(force_selection=True, force_content=True)
         self.ui.update_menus_by_selection()
+        self.ui.update_status()
 
     def flood_selection(self, value: int):
         widget = self.ui.editor
@@ -490,6 +503,7 @@ class Engine(BaseEngine):
 
         widget.update_view(force_selection=True, force_content=True)
         self.ui.update_menus_by_selection()
+        self.ui.update_status()
 
     def reserve_selection(self):
         widget = self.ui.editor
@@ -1408,6 +1422,7 @@ class Engine(BaseEngine):
                 self.set_cursor_cell(cursor_cell_x, cursor_cell_y, status.cursor_digit)
 
             widget.update_view(force_selection=True)
+            self.ui.update_status()
 
     def on_cells_selection_release(
         self,
@@ -1465,6 +1480,7 @@ class Engine(BaseEngine):
                 self.set_cursor_cell(cursor_cell_x, cursor_cell_y, status.cursor_digit)
 
             widget.update_view(force_selection=True)
+            self.ui.update_status()
 
     def on_chars_selection_release(
         self,
