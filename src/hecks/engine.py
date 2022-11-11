@@ -87,6 +87,7 @@ class Engine(BaseEngine):
             widget.update_view(force_selection=True)
         else:
             self.escape_selection()
+        self.ui.update_status()
 
     def escape_selection(self) -> None:
         widget = self.ui.editor
