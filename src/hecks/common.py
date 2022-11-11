@@ -15,9 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Hecks.  If not, see <https://www.gnu.org/licenses/>.
 
+import abc
 import enum
-import tkinter as tk
 from math import floor
+from typing import List
 from typing import MutableMapping
 from typing import Optional
 from typing import Tuple
@@ -70,7 +71,7 @@ class SelectionMode(enum.IntEnum):
 
 # =====================================================================================================================
 
-BYTE_ENCODINGS = (
+BYTE_ENCODINGS: List[str] = [
     'ascii',
     'cp437',
     'cp737',
@@ -116,10 +117,10 @@ BYTE_ENCODINGS = (
     'iso8859_14',
     'iso8859_15',
     'iso8859_16',
-)
+]
 
 
-def build_encoding_table(encoding: str, nonprintable: str = '.') -> Tuple[str]:
+def build_encoding_table(encoding: str, nonprintable: str = '.') -> List[str]:
     lut = []
     for i in range(256):
         try:
@@ -127,7 +128,6 @@ def build_encoding_table(encoding: str, nonprintable: str = '.') -> Tuple[str]:
         except UnicodeError:
             t = nonprintable
         lut.append(t if t.isprintable() else nonprintable)
-    lut = tuple(lut)
     return lut
 
 
@@ -140,7 +140,7 @@ class EngineStatus:
         self.file_path: Optional[str] = None
 
         # Initialize memory
-        # XXX FIXME: allocate some dummy data for debug
+        # XXX FIXME DEBUG: allocate some dummy data for debug
         data = bytes(range(256)) * 8
         self.memory = Memory.from_bytes(data, offset=0xDA7A0000)
 
@@ -287,463 +287,593 @@ class EngineStatus:
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class EngineFileCallbacks:
+class EngineFileCallbacks(abc.ABC):
 
+    @abc.abstractmethod
     def on_file_new(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_file_open(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_file_import(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_file_save(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_file_save_as(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_file_settings(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_file_exit(self) -> None:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class EngineEditCallbacks:
+class EngineEditCallbacks(abc.ABC):
 
+    @abc.abstractmethod
     def on_edit_undo(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_redo(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_cut(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_copy(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_paste(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_delete(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_cursor_mode(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_clear(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_reserve(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_fill(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_flood(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_crop(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_move_focus(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_move_apply(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_export(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_select_all(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_select_range(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_copy_address(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_edit_find(self) -> None:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class EngineViewCallbacks:
+class EngineViewCallbacks(abc.ABC):
 
+    @abc.abstractmethod
     def on_view_line_length_custom(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_view_address_bits_custom(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_view_chars_encoding_custom(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_view_redraw(self) -> None:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class EngineNavigationCallbacks:
+class EngineNavigationCallbacks(abc.ABC):
 
+    @abc.abstractmethod
     def on_nav_editor_focus(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_address_start_focus(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_address_start_apply(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_address_endin_focus(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_address_endin_apply(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_address_copy(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_start(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_endin(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_memory_endex(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_address_skip(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_block_previous(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_block_next(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_block_start(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_block_endin(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_byte_previous(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_byte_next(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_line_start(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_goto_line_endin(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_scroll_line_up(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_scroll_line_down(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_scroll_page_up(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_scroll_page_down(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_scroll_top(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_nav_scroll_bottom(self) -> None:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class EngineHelpCallbacks:
+class EngineHelpCallbacks(abc.ABC):
 
+    @abc.abstractmethod
     def on_help_about(self) -> None:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class EngineSetCallbacks:
+class EngineSetCallbacks(abc.ABC):
 
+    @abc.abstractmethod
     def on_set_chars_visible(self, visible: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_line_length(self, line_length: CellCoord) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_chars_encoding(self, encoding: str) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_cell_mode(self, mode: ValueFormatEnum) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_cell_prefix(self, prefix: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_cell_suffix(self, suffix: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_cell_zeroed(self, zeroed: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_address_mode(self, mode: ValueFormatEnum) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_address_prefix(self, prefix: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_address_suffix(self, suffix: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_address_zeroed(self, zeroed: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_address_skip(self, skip: Address) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_address_bits(self, bitsize: int) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_offset_mode(self, mode: ValueFormatEnum) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_offset_prefix(self, prefix: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_offset_suffix(self, suffix: bool) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_set_offset_zeroed(self, zeroed: bool) -> None:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class EngineEditorCallbacks:
+class EngineEditorCallbacks(abc.ABC):
 
+    @abc.abstractmethod
     def on_key_digit_cells(self, digit: Value):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_digit_chars(self, digit: Value):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_reserve_cell(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_delete_cell(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_clear_cell(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_clear_back(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_clear_next(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_delete(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_fill(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_flood(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_cut(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_copy(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_paste(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_crop(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_focus(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_apply(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_scroll_line_up(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_scroll_page_up(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_scroll_line_down(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_scroll_page_down(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_scroll_top(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_scroll_bottom(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_left_digit(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_right_digit(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_left_byte(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_right_byte(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_line_up(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_page_up(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_line_down(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_move_page_down(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_line_start(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_line_endin(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_memory_apply(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_memory_focus(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_memory_start(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_memory_endin(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_memory_endex(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_block_previous(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_block_next(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_block_start(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_goto_block_endin(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_copy_address(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_set_address(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_select_all(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_select_range(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_escape_selection(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_switch_cursor_mode(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_redraw(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_undo(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_key_redo(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_cells_selection_press(
         self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_cells_selection_double(
         self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_cells_selection_motion(
         self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_cells_selection_release(
         self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         cell_digit: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_chars_selection_press(
         self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_chars_selection_double(
         self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_chars_selection_motion(
         self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def on_chars_selection_release(
         self,
         char_x: CellCoord,
         char_y: CellCoord,
     ):
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -757,6 +887,7 @@ class BaseEngine(
     EngineSetCallbacks,
     EngineEditorCallbacks,
 ):
+
     def __init__(
         self,
         ui: 'BaseUserInterface' = None,
@@ -768,141 +899,183 @@ class BaseEngine(
         self.ui: 'BaseUserInterface' = ui
         self.status: EngineStatus = status
 
+    @abc.abstractmethod
     def escape_selection(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def select_homogeneous(self, address: Address) -> Tuple[Address, Address, Optional[Value]]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def select_range(self, start: Address, endex: Address) -> Tuple[Address, Address]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def select_all(self) -> Tuple[Address, Address]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def switch_selection_mode(self) -> SelectionMode:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def shift_memory(self, offset: Address) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def shift_selection(self, offset: Address) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def write_digit(self, digit_char: str, insert: bool = False) -> bool:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def write_byte(self, value: int, insert: bool = False) -> bool:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def reserve_cell(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def clear_cell(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def delete_cell(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def clear_selection(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def delete_selection(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def crop_selection(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def cut_selection(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def copy_selection(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def paste_selection(self, clear: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def fill_selection(self, value: int):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def flood_selection(self, value: int):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def reserve_selection(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def copy_cursor_address(self) -> str:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def switch_cursor_mode(self) -> CursorMode:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def set_cursor_cell(
         self,
         cell_x: CellCoord,
         cell_y: CellCoord,
         digit: CellCoord,
     ) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_memory_absolute(self, address: Address, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_memory_relative(self, delta: Address, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_memory_start(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_memory_endin(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_memory_endex(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_line_start(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_line_endin(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_line_endex(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_block_start(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_block_endin(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_block_previous(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def goto_block_next(self, selecting: bool = False):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def move_up(self, delta_y: CellCoord = 1, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def move_down(self, delta_y: CellCoord = 1, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def move_page_up(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def move_page_down(self, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def move_left(self, whole_byte: bool = True, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def move_right(self, whole_byte: bool = True, selecting: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class BaseMemento:
+class BaseMemento(abc.ABC):
 
     def __init__(
         self,
@@ -912,16 +1085,18 @@ class BaseMemento:
         self._engine: BaseEngine = engine
         self._status: EngineStatus = status
 
+    @abc.abstractmethod
     def redo(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def undo(self) -> None:
-        raise NotImplementedError
+        ...
 
 
 # =====================================================================================================================
 
-class BaseEditorWidget:
+class BaseEditorWidget(abc.ABC):
 
     def __init__(self):
         self._address_start: Address = 0  # dummy
@@ -975,83 +1150,101 @@ class BaseEditorWidget:
             self._chars_visible = visible
             self.redraw()
 
+    @abc.abstractmethod
     def focus_set(self):
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def get_half_page_height(self) -> CellCoord:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def get_cell_bounds_y(self) -> Tuple[CellCoord, CellCoord]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def mark_dirty_cell(
         self,
         cell_x: CellCoord,
         cell_y: CellCoord,
-    ):
-        raise NotImplementedError
+    ) -> None:
+        ...
 
-    def mark_dirty_all(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def mark_dirty_all(self) -> None:
+        ...
 
+    @abc.abstractmethod
     def mark_dirty_inline(
         self,
         start_x: Optional[CellCoord] = None,
         start_y: Optional[CellCoord] = None,
         endin_x: Optional[CellCoord] = None,
         endin_y: Optional[CellCoord] = None,
-    ):
-        raise NotImplementedError
+    ) -> None:
+        ...
 
+    @abc.abstractmethod
     def mark_dirty_range(
         self,
         start_address: Optional[Address] = None,
         endex_address: Optional[Address] = None,
-    ):
-        raise NotImplementedError
+    ) -> None:
+        ...
 
-    def update_vbar(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def update_vbar(self) -> None:
+        ...
 
+    @abc.abstractmethod
     def update_view(
         self,
         force_geometry: bool = False,
         force_selection: bool = False,
         force_content: bool = False,
-    ):
-        raise NotImplementedError
+    ) -> None:
+        ...
 
-    def update_cursor(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def update_cursor(self) -> None:
+        ...
 
-    def redraw(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def redraw(self) -> None:
+        ...
 
+    @abc.abstractmethod
     def scroll_up(self, delta_y: int = 1) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def scroll_down(self, delta_y: int = 1) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def scroll_page_up(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def scroll_page_down(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def scroll_top(self, delta_y: CellCoord = 0) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def scroll_bottom(self, delta_y: CellCoord = 0) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def ask_big_selection(self, size: Address) -> bool:
-        raise NotImplementedError
+        ...
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class BaseUserInterface:
+class BaseUserInterface(abc.ABC):
 
     def __init__(
         self,
@@ -1061,7 +1254,7 @@ class BaseUserInterface:
         self._manager_key: int = manager.add(self)
         self.editor: Optional[BaseEditorWidget] = None
 
-    def quit(self):
+    def quit(self) -> None:
         self._manager.remove(self._manager_key)
 
     def create_new(self) -> 'BaseUserInterface':
@@ -1069,77 +1262,101 @@ class BaseUserInterface:
         ui = cls(self._manager)
         return ui
 
-    def update_status(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def update_status(self) -> None:
+        ...
 
+    @abc.abstractmethod
     def get_start_text(self) -> str:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def set_start_text(self, text: str, focus: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def focus_start_text(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def get_start_address(self) -> Address:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def set_start_address(self, address: Address) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def get_endin_text(self) -> str:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def set_endin_text(self, text: str, focus: bool = False) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def focus_endin_text(self) -> None:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def get_endin_address(self) -> Address:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def set_endin_address(self, address: Address) -> None:
-        raise NotImplementedError
+        ...
 
-    def show_about(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def show_about(self) -> None:
+        ...
 
-    def show_info(self, title: str, message: str):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def show_info(self, title: str, message: str) -> None:
+        ...
 
-    def show_warning(self, title: str, message: str):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def show_warning(self, title: str, message: str) -> None:
+        ...
 
-    def show_error(self, title: str, message: str):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def show_error(self, title: str, message: str) -> None:
+        ...
 
+    @abc.abstractmethod
     def ask_open_file_path(self) -> Optional[str]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def ask_save_file_path(self) -> Optional[str]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def ask_line_length_custom(self) -> Optional[int]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def ask_address_bits_custom(self) -> Optional[int]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def ask_address_skip_custom(self) -> Optional[int]:
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def ask_chars_encoding_custom(self) -> Optional[int]:
-        raise NotImplementedError
+        ...
 
-    def update_title_by_file_path(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def update_title_by_file_path(self) -> None:
+        ...
 
-    def update_menus_by_selection(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def update_menus_by_selection(self) -> None:
+        ...
 
-    def update_menus_by_cursor(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def update_menus_by_cursor(self) -> None:
+        ...
 
 
 # =====================================================================================================================
@@ -1170,6 +1387,6 @@ class BaseInstanceManager:
         pass
 
     def quit(self) -> None:
-        for instance in list(self._instances.values()):
+        while self._instances:
+            _, instance = self._instances.popitem()
             instance.quit()
-        self._instances.clear()
