@@ -538,6 +538,7 @@ class Engine(BaseEngine):
         else:
             status.cursor_mode = CursorMode.OVERWRITE
         widget.update_cursor()
+        self.ui.update_status()
         return status.cursor_mode
 
     def set_cursor_cell(
@@ -1248,7 +1249,10 @@ class Engine(BaseEngine):
             self.ui.editor.focus_set()
 
     def on_key_cut(self):
-        self.cut_selection()
+        if self.status.sel_mode == SelectionMode.OFF:
+            self.on_key_delete_cell()
+        else:
+            self.cut_selection()
 
     def on_key_copy(self):
         self.copy_selection()
