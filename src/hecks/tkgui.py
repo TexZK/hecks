@@ -3160,8 +3160,8 @@ class InstanceManager(BaseInstanceManager):
         root.withdraw()
         self._root: tk.Tk = root
 
-    def remove(self, key: int) -> object:
-        instance = super().remove(key)
+    def remove(self, index: int) -> object:
+        instance = super().remove(index)
         if self:
             return instance
         else:

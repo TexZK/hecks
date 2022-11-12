@@ -44,6 +44,8 @@ CharCoords = Tuple[CharCoord, CharCoord]
 CellCoord = int
 CellCoords = Tuple[CellCoord, CellCoord]
 
+InstanceIndex = int
+
 
 PROGRAM_TITLE: str = 'Hecks!'
 
@@ -1364,8 +1366,8 @@ class BaseUserInterface(abc.ABC):
 class BaseInstanceManager:
 
     def __init__(self):
-        self._counter: int = 0
-        self._instances: MutableMapping[int, BaseUserInterface] = {}
+        self._counter: InstanceIndex = 0
+        self._instances: MutableMapping[InstanceIndex, BaseUserInterface] = {}
 
     def __len__(self) -> int:
         return len(self._instances)
@@ -1373,14 +1375,14 @@ class BaseInstanceManager:
     def __bool__(self) -> bool:
         return bool(self._instances)
 
-    def add(self, instance: BaseUserInterface) -> int:
+    def add(self, instance: BaseUserInterface) -> InstanceIndex:
         key = self._counter
         self._instances[key] = instance
         self._counter += 1
         return key
 
-    def remove(self, key: int) -> object:
-        instance = self._instances.pop(key)
+    def remove(self, index: InstanceIndex) -> BaseUserInterface:
+        instance = self._instances.pop(index)
         return instance
 
     def run(self) -> None:
