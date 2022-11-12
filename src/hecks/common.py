@@ -1157,6 +1157,14 @@ class BaseEditorWidget(abc.ABC):
         ...
 
     @abc.abstractmethod
+    def focus_set_cells(self):
+        ...
+
+    @abc.abstractmethod
+    def focus_set_chars(self):
+        ...
+
+    @abc.abstractmethod
     def get_half_page_height(self) -> CellCoord:
         ...
 

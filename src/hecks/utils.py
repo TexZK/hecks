@@ -233,7 +233,7 @@ def memory_to_clipboard(
     count = 0
     block_tokens = []
 
-    for address, items in memory._blocks:
+    for address, items in memory.blocks():
         count += 1
         size = len(items)
 

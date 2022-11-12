@@ -849,7 +849,7 @@ class Engine(BaseEngine):
         if file_path:
             memory = self._file_load(file_path)
             merged = self.status.memory
-            for start, items in memory._blocks:
+            for start, items in memory.blocks():
                 merged.write(start, items)
 
     def _file_save(self, file_path: str, memory: Memory) -> None:
@@ -858,14 +858,14 @@ class Engine(BaseEngine):
         except KeyError:
             if memory.contiguous:
                 with open(file_path, 'wb') as stream:
-                    for start, items in memory._blocks:
+                    for start, items in memory.blocks():
                         stream.write(items)
             else:
                 self.ui.show_error('Not contiguous',
                                    'Cannot save a non-contiguous\n'
                                    'chunk of data as binary file')
         else:
-            _hr.save_blocks(file_path, memory._blocks, record_type=record_type)
+            _hr.save_blocks(file_path, list(memory.blocks()), record_type=record_type)
 
     def on_file_save(self) -> None:
         status = self.status
@@ -1384,7 +1384,7 @@ class Engine(BaseEngine):
         self.escape_selection()
 
         widget = self.ui.editor
-        widget.cells_canvas.focus_set()
+        widget.focus_set_cells()
 
     def on_cells_selection_double(
         self,
@@ -1405,7 +1405,7 @@ class Engine(BaseEngine):
         status = self.status
         widget = self.ui.editor
 
-        widget.cells_canvas.focus_set()
+        widget.focus_set_cells()
         cursor_cell_prev = status.cursor_cell
         self.set_cursor_cell(cell_x, cell_y, cell_digit)
 
@@ -1445,7 +1445,7 @@ class Engine(BaseEngine):
     ):
         self.set_cursor_cell(char_x, char_y, 0)
         self.escape_selection()
-        self.ui.editor.chars_canvas.focus_set()
+        self.ui.editor.focus_set_chars()
 
     def on_chars_selection_double(
         self,
@@ -1463,7 +1463,7 @@ class Engine(BaseEngine):
         status = self.status
         widget = self.ui.editor
 
-        widget.chars_canvas.focus_set()
+        widget.focus_set_chars()
         cursor_cell_prev = status.cursor_cell
         self.set_cursor_cell(char_x, char_y, 0)
 
@@ -1492,5 +1492,5 @@ class Engine(BaseEngine):
         char_y: CellCoord,
     ):
         widget = self.ui.editor
-        widget.chars_canvas.focus_set()
+        widget.focus_set_chars()
         widget.update_view(force_selection=True)

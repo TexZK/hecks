@@ -692,7 +692,16 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self.bind('<Configure>', self.on_configure)
 
     def focus_set(self):
+        self.focus_set_cells()
+
+    def focus_set_cells(self):
         self._cells_canvas.focus_set()
+
+    def focus_set_chars(self):
+        if self._chars_visible:
+            self._chars_canvas.focus_set()
+        else:
+            self.focus_set_cells()
 
     @property
     def cells_canvas(self) -> tk.Canvas:
