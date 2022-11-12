@@ -47,6 +47,7 @@ from .common import CursorMode
 from .common import EngineStatus
 from .common import FloatCoords
 from .common import SelectionMode
+from .engine import Engine
 from .utils import HEX_SET
 from .utils import ValueFormatEnum
 from .utils import parse_int
@@ -3177,3 +3178,15 @@ class InstanceManager(BaseInstanceManager):
     @property
     def root(self) -> tk.Tk:
         return self._root
+
+
+# =====================================================================================================================
+
+def main() -> None:
+    manager = InstanceManager()
+    UserInterface(manager, Engine)
+    manager.run()
+
+
+if __name__ == '__main__':
+    main()

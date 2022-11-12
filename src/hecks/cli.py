@@ -31,8 +31,9 @@ Why does this file exist, and why not put this in __main__?
 
   Also see (1) from http://click.pocoo.org/5/setuptools/#setuptools-integration
 """
-
 import click
+
+from hecks.tkgui import main as _tkgui_main
 
 
 # ============================================================================
@@ -46,6 +47,5 @@ def main() -> None:
     commands follow POSIX-like syntax rules, as well as reserving the virtual
     file path ``-`` for command chaining via standard output/input buffering.
     """
-    print('CLI NOT YET AVAILABLE')  # TODO
-    print('Please run the GUI instead:')
-    print('\t<hecks_root>/pyinstaller/hecks_gui.py')
+    # TODO: CLI not yet available, falling back to Tk GUI
+    _tkgui_main()

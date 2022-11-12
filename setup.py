@@ -76,9 +76,9 @@ setup(
     extras_require={
     },
     entry_points={
-        # 'console_scripts': [
-        #     'hecks = hecks.cli:main',
-        # ],
+        'console_scripts': [
+            'hecks = hecks.cli:main',
+        ],
         'testing': [
             'pytest',
         ],
