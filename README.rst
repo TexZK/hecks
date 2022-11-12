@@ -10,26 +10,28 @@ Overview
     * - docs
       - |docs|
     * - tests
-      - | |requires|
+      - | |gh_actions|
+        | |codecov|
     * - package
-      - | |version| |wheel| |supported-versions| |supported-implementations|
-        | |commits-since|
+      - | |version| |wheel|
+        | |supported-versions|
+        | |supported-implementations|
 
 .. |docs| image:: https://readthedocs.org/projects/hecks/badge/?style=flat
     :target: https://readthedocs.org/projects/hecks
     :alt: Documentation Status
 
-.. |requires| image:: https://requires.io/github/TexZK/hecks/requirements.svg?branch=main
-    :alt: Requirements Status
-    :target: https://requires.io/github/TexZK/hecks/requirements/?branch=main
+.. |gh_actions| image:: https://github.com/TexZK/hecks/workflows/CI/badge.svg
+    :alt: GitHub Actions Status
+    :target: https://github.com/TexZK/hecks
+
+.. |codecov| image:: https://codecov.io/gh/TexZK/hecks/branch/main/graphs/badge.svg?branch=main
+    :alt: Coverage Status
+    :target: https://codecov.io/github/TexZK/hecks
 
 .. |version| image:: https://img.shields.io/pypi/v/hecks.svg
     :alt: PyPI Package latest release
     :target: https://pypi.org/project/hecks/
-
-.. |commits-since| image:: https://img.shields.io/github/commits-since/TexZK/hecks/v0.0.1.svg
-    :alt: Commits since latest release
-    :target: https://github.com/TexZK/hecks/compare/v0.0.1...main
 
 .. |wheel| image:: https://img.shields.io/pypi/wheel/hecks.svg
     :alt: PyPI Wheel
@@ -102,15 +104,26 @@ https://hecks.readthedocs.io/
 Installation
 ============
 
-From PIP (might not be the latest version found on *github*):
+From PyPI (might not be the latest version found on *github*):
 **(NOT YET AVAILABLE)**
 
 .. code-block:: sh
 
     $ pip install hecks
 
-From source:
+From the source code root directory:
 
 .. code-block:: sh
 
-    $ python setup.py install
+    $ pip install .
+
+
+Development
+===========
+
+To run the all the tests:
+
+.. code-block:: sh
+
+    $ pip install tox
+    $ tox
