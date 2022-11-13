@@ -18,11 +18,12 @@
 import pkgutil
 import tkinter as tk
 import tkinter.filedialog
-import tkinter.font
 import tkinter.messagebox
 import tkinter.simpledialog
 from math import floor
 from tkinter import ttk
+
+import ttkthemes
 from typing import Any
 from typing import Callable
 from typing import MutableMapping
@@ -62,11 +63,66 @@ PixelCoords = Tuple[PixelCoord, PixelCoord]
 CanvasObject = int
 
 
-_COLOR_ODD: str = 'sienna4'
+_THEME: str = 'black'
+_COLOR_BG: str = 'SystemWindow'
+_COLOR_FG: str = 'SystemWindowText'
+_COLOR_OG: str = 'grey25'
+_COLOR_CUR: str = 'red'
+_COLOR_SEL_BG: str = 'SystemHighlight'
+_COLOR_SEL_FG: str = 'SystemHighlightText'
+_COLOR_SEL_OG: str = 'grey75'
+
+_TOOLTIP_FONT: Union[Tuple[str, int], str] = 'TkTooltipFont'
+_TOOLTIP_FG: str = 'SystemButtonText'
+_TOOLTIP_BG: str = 'lightyellow'
+_TOOLTIP_CLEARANCE: PixelCoords = (5, 50)
 
 
-def _is_shift_in_event(event: Any = None):
+def _is_shift_in_event(event: Any = None) -> bool:
     return (event.state & 1) != 0 if event else False
+
+
+def _fix_global_colors(root: ttkthemes.ThemedTk) -> None:
+    global _COLOR_BG
+    global _COLOR_FG
+    global _COLOR_OG
+    global _COLOR_SEL_FG
+    global _COLOR_SEL_BG
+    global _COLOR_SEL_OG
+    global _TOOLTIP_FG
+    global _TOOLTIP_BG
+    ttk_style = ttk.Style()
+
+    bg_color = ttk_style.lookup('TLabelFrame', 'background') or _COLOR_BG
+    _COLOR_BG = bg_color
+    bg_rgb = root.winfo_rgb(bg_color)
+
+    fg_color = ttk_style.lookup('TLabelFrame', 'foreground') or _COLOR_FG
+    _COLOR_FG = fg_color
+    fg_rgb = root.winfo_rgb(fg_color)
+
+    _COLOR_OG = mix_color_hex(*fg_rgb, *bg_rgb, 0.25)
+
+    sel_bg_color = ttk_style.lookup('TEntry', 'selectbackground') or _COLOR_SEL_BG
+    _COLOR_SEL_BG = sel_bg_color
+    sel_bg_rgb = root.winfo_rgb(sel_bg_color)
+
+    sel_fg_color = ttk_style.lookup('TEntry', 'selectforeground') or _COLOR_SEL_FG
+    _COLOR_SEL_FG = sel_fg_color
+    sel_fg_rgb = root.winfo_rgb(sel_fg_color)
+
+    _COLOR_SEL_OG = mix_color_hex(*sel_fg_rgb, *sel_bg_rgb, 0.25)
+
+    _TOOLTIP_FG = _COLOR_SEL_FG
+    _TOOLTIP_BG = _COLOR_SEL_BG
+
+
+def mix_color_hex(x_r, x_g, x_b, y_r, y_g, y_b, m) -> str:
+    r = (max(0, min(int(((1 - m) * x_r) + (m * y_r)), 65535)) + 128) // 256
+    g = (max(0, min(int(((1 - m) * x_g) + (m * y_g)), 65535)) + 128) // 256
+    b = (max(0, min(int(((1 - m) * x_b) + (m * y_b)), 65535)) + 128) // 256
+    c = f'#{r:02X}{g:02X}{b:02X}'
+    return c
 
 
 # =====================================================================================================================
@@ -115,21 +171,21 @@ class Tooltip:
 
     def __init__(
         self,
-        widget: tk.BaseWidget,
+        widget: ttk.Widget,
         text: str = '',
         time: int = 2000,
-        font: Union[Tuple[str, int], str] = 'TkTooltipFont',
-        fg: str = 'SystemButtonText',
-        bg: str = 'lightyellow',
-        clearance_x: int = 5,
-        clearance_y: int = 50,
+        font: Union[Tuple[str, int], str] = _TOOLTIP_FONT,
+        fg: Optional[str] = None,
+        bg: Optional[str] = None,
+        clearance_x: int = _TOOLTIP_CLEARANCE[0],
+        clearance_y: int = _TOOLTIP_CLEARANCE[1],
     ):
-        self._widget: tk.BaseWidget = widget
-        self._text: str = text
-        self._time: int = time
-        self._font: Union[Tuple[str, int], str] = font
-        self._fg: str = fg
-        self._bg: str = bg
+        self._widget = widget
+        self._text = text
+        self._time = time
+        self._font = font
+        self._fg = fg or _TOOLTIP_FG
+        self._bg = bg or _TOOLTIP_BG
         self._clearance_x = clearance_x
         self._clearance_y = clearance_y
         self._tooltip: Optional[tk.Toplevel] = None
@@ -139,7 +195,7 @@ class Tooltip:
         widget.bind('<Leave>', self._leave)
 
     @property
-    def widget(self) -> tk.BaseWidget:
+    def widget(self) -> ttk.Widget:
         return self._widget
 
     def config(
@@ -176,8 +232,8 @@ class Tooltip:
             self._tooltip = tooltip
             tooltip.overrideredirect(True)
 
-            label = tk.Label(tooltip, text=self._text, fg=self._fg, bg=self._bg, relief=tk.RIDGE, borderwidth=1,
-                             font=self._font)
+            label = tk.Label(tooltip, text=self._text, fg=self._fg, bg=self._bg,
+                                  relief=tk.RIDGE, borderwidth=1, font=self._font)
             label.pack(ipadx=5)
 
         tooltip.update_idletasks()
@@ -220,11 +276,11 @@ class Tooltip:
 
 # =====================================================================================================================
 
-class ToolbarTray(tk.Frame):
+class ToolbarTray(ttk.Frame):
 
     def __init__(self, parent, text_kwargs=None, **kwargs):
         d = dict(
-            highlightthickness=0,
+            # highlightthickness=0,  # missing with ttk
             takefocus=0,
         )
         d.update(kwargs)
@@ -238,9 +294,10 @@ class ToolbarTray(tk.Frame):
         text_kwargs.setdefault('height', 1)
         text_kwargs.setdefault('padx', 0)
         text_kwargs.setdefault('pady', 0)
-        text_kwargs.setdefault('highlightthickness', 0)
+        # text_kwargs.setdefault('highlightthickness', 0)  # missing with ttk
         text_kwargs.setdefault('insertborderwidth', 0)
         text_kwargs.setdefault('selectborderwidth', 0)
+        text_kwargs.setdefault('bg', _COLOR_BG)
         text_kwargs.setdefault('takefocus', 0)
         text_kwargs.setdefault('spacing1', 0)
         text_kwargs.setdefault('spacing2', 0)
@@ -251,8 +308,9 @@ class ToolbarTray(tk.Frame):
         container = tk.Text(self, **text_kwargs)
         self._container = container
         container.pack(side=tk.TOP, expand=True, fill=tk.BOTH)
+        self._bg = text_kwargs['bg']
 
-        container.configure(bg=self.cget('background'), cursor='arrow', state=tk.DISABLED)
+        container.configure(bg=self._bg, cursor='arrow', state=tk.DISABLED)
         container.bind('<Key>', lambda _: 'break')
         container.bind('<1>', lambda _: 'break')
 
@@ -264,7 +322,7 @@ class ToolbarTray(tk.Frame):
     def _on_configure(self, event=None, force=False):
         self.update_idletasks()
         container = self._container
-        container.configure(bg=self.cget('background'))
+        container.configure(bg=self._bg)
 
         borderwidth = self.cget('borderwidth')
         widget_height = self.winfo_height()
@@ -277,7 +335,7 @@ class ToolbarTray(tk.Frame):
 
 # ---------------------------------------------------------------------------------------------------------------------
 
-class Toolbar(tk.Frame):
+class Toolbar(ttk.Frame):
 
     def __init__(self, parent, **kwargs):
         if 'borderwidth' not in kwargs and 'bd' not in kwargs:
@@ -285,17 +343,22 @@ class Toolbar(tk.Frame):
         kwargs.setdefault('relief', tk.RIDGE)
         super().__init__(parent, **kwargs)
 
-        self._widgets: MutableMapping[Any, Any] = {}
+        self._widgets: MutableMapping[Any, ttk.Widget] = {}
         self._tooltips: MutableMapping[Any, Tooltip] = {}
 
     @property
     def widget_count(self) -> int:
         return len(self._widgets)
 
-    def get_widget(self, name: str):
+    def get_widget(self, name: str) -> ttk.Widget:
         return self._widgets[name]
 
-    def add_widget(self, widget: tk.BaseWidget, key: Any = None, tooltip: Optional[str] = None):
+    def add_widget(
+        self, widget: ttk.Widget,
+        key: Any = None,
+        tooltip: Optional[str] = None,
+    ) -> ttk.Widget:
+
         self._widgets[key] = widget
         if tooltip and key is None:
             key = tooltip
@@ -303,7 +366,13 @@ class Toolbar(tk.Frame):
             self._tooltips[key] = Tooltip(widget, text=tooltip)
         return widget
 
-    def add_button(self, key: Any = None, tooltip: Optional[str] = None, **kwargs):
+    def add_button(
+        self,
+        key: Any = None,
+        tooltip: Optional[str] = None,
+        **kwargs
+    ) -> ttk.Widget:
+
         if tooltip and not key:
             key = tooltip
         kwargs.setdefault('style', 'Toolbutton')
@@ -312,14 +381,14 @@ class Toolbar(tk.Frame):
         self.add_widget(widget, key=key, tooltip=tooltip)
         return widget
 
-    def add_separator(self, **kwargs):
+    def add_separator(self, **kwargs) -> ttk.Widget:
         kwargs.setdefault('orient', tk.VERTICAL)
         widget = ttk.Separator(self, **kwargs)
         key = -self.widget_count  # separators have negative integer key
         self.add_widget(widget, key=key)
         return widget
 
-    def finalize(self, pad_x: int = 4, pad_y: int = 1, pad_y_sep: int = 4):
+    def finalize(self, pad_x: int = 4, pad_y: int = 1, pad_y_sep: int = 4) -> None:
         last = self.widget_count - 1
 
         for index, (key, widget) in enumerate(self._widgets.items()):
@@ -346,7 +415,7 @@ class Toolbar(tk.Frame):
 
 # =====================================================================================================================
 
-class EditorWidget(BaseEditorWidget, tk.Frame):
+class EditorWidget(BaseEditorWidget, ttk.Frame):
 
     def __init__(
         self,
@@ -362,9 +431,8 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self._engine = engine
         self._status = status  # read-only
 
-        kwargs.setdefault('padx', 0)
-        kwargs.setdefault('pady', 0)
-        tk.Frame.__init__(self, parent, width=width, height=height, **kwargs)
+        kwargs.setdefault('padding', (0, 0))
+        ttk.Frame.__init__(self, parent, width=width, height=height, **kwargs)
 
         BaseEditorWidget.__init__(self)
 
@@ -379,17 +447,17 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
 
         self.on_cells_focus_out()
 
-    def __init_misc(self, pad_x, pad_y):
-        self._pad_x: PixelCoord = pad_x
-        self._pad_y: PixelCoord = pad_y
+    def __init_misc(self, pad_x: PixelCoord, pad_y: PixelCoord) -> None:
+        self._pad_x = pad_x
+        self._pad_y = pad_y
 
-        font = tkinter.font.Font(font=('Consolas', 10))
+        font = tk.font.Font(font=('Consolas', 10))
         font_w = font.measure('#')
         font_h = font.metrics('linespace')
 
-        self._font: tk.font.Font = font
-        self._font_w: PixelCoord = font_w
-        self._font_h: PixelCoord = font_h
+        self._font = font
+        self._font_w = font_w
+        self._font_h = font_h
 
         status = self._status
         line_length = status.line_length
@@ -405,13 +473,13 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self._sel_start_address_prev: Address = -1  # dummy
         self._sel_endin_address_prev: Address = -1  # dummy
 
-    def __init_address_bar(self):
+    def __init_address_bar(self) -> None:
         pad_x, pad_y = self._pad_x, self._pad_y
         font_w, font_h = self._font_w, self._font_h
         address_format_length = self._status.address_format_length
 
-        address_skip_label = tk.Label(self, anchor=tk.NW, font=self._font, padx=pad_x, pady=pad_y, borderwidth=0)
-        self._address_skip_label: tk.Label = address_skip_label
+        address_skip_label = ttk.Label(self, anchor=tk.NW, font=self._font, padding=(pad_x, pad_y), borderwidth=0)
+        self._address_skip_label = address_skip_label
         Tooltip(address_skip_label, text='Address skip')
 
         address_canvas_w = pad_x + (font_w * address_format_length) + pad_x
@@ -419,13 +487,13 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self._address_canvas_size: PixelCoords = (address_canvas_w, address_canvas_h)
 
         address_canvas = tk.Canvas(self, width=address_canvas_w, height=address_canvas_h,
-                                   borderwidth=0, highlightthickness=0)
-        self._address_canvas: tk.Canvas = address_canvas
-        self._address_canvas_w: int = address_canvas_w
+                                        bg=_COLOR_BG, borderwidth=0, highlightthickness=0)
+        self._address_canvas = address_canvas
+        self._address_canvas_w: PixelCoord = address_canvas_w
 
         self._addrs_text_id: MutableMapping[CellCoord, CanvasObject] = {}
 
-    def __init_offset_bar(self):
+    def __init_offset_bar(self) -> None:
         pad_x, pad_y = self._pad_x, self._pad_y
         font_w, font_h = self._font_w, self._font_h
         font = self._font
@@ -434,14 +502,16 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         offset_h = pad_y + font_h + pad_y
         self._offset_canvas_size: PixelCoords = (offset_w, offset_h)
 
-        offset_canvas = tk.Canvas(self, width=offset_w, height=offset_h, borderwidth=0, highlightthickness=0,
-                                  scrollregion=(0, 0, offset_w, 1))
-        self._offset_canvas: tk.Canvas = offset_canvas
+        offset_canvas = tk.Canvas(self, width=offset_w, height=offset_h,
+                                       bg=_COLOR_BG, borderwidth=0, highlightthickness=0,
+                                       scrollregion=(0, 0, offset_w, 1))
+        self._offset_canvas = offset_canvas
 
-        offset_text_id: CanvasObject = offset_canvas.create_text(1 + pad_x, pad_y, text='', anchor=tk.NW, font=font)
+        offset_text_id: CanvasObject = offset_canvas.create_text(1 + pad_x, pad_y, text='', anchor=tk.NW,
+                                                                 font=font, fill=_COLOR_FG)
         self._offset_text_id = offset_text_id
 
-    def __init_cells_view(self):
+    def __init_cells_view(self) -> None:
         pad_y = self._pad_y
         font_h = self._font_h
         view_w = self._view_w
@@ -452,23 +522,23 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self._cells_pixel_y_prev: PixelCoord = -1  # dummy
 
         cells_canvas = tk.Canvas(self, width=view_w, height=view_h, borderwidth=1, highlightthickness=0,
-                                 relief=tk.SUNKEN, bg='SystemWindow', cursor='xterm', scrollregion=(0, 0, view_w, 1),
-                                 takefocus=1)
-        self._cells_canvas: tk.Canvas = cells_canvas
+                                      relief=tk.SUNKEN, bg=_COLOR_BG, cursor='xterm',
+                                      scrollregion=(0, 0, view_w, 1), takefocus=1)
+        self._cells_canvas = cells_canvas
 
         self._cells_text_id: MutableMapping[CellCoords, CanvasObject] = {}
         self._cells_rect_id: MutableMapping[CellCoords, CanvasObject] = {}
 
-        cells_vbar = tk.Scrollbar(self, orient=tk.VERTICAL)
+        cells_vbar = ttk.Scrollbar(self, orient=tk.VERTICAL)
         cells_vbar.set(0, 1)
         cells_vbar.configure(command=self._on_vbar)
-        self._cells_vbar: tk.Scrollbar = cells_vbar
+        self._cells_vbar: ttk.Scrollbar = cells_vbar
 
-        cells_hbar = tk.Scrollbar(self, orient=tk.HORIZONTAL)
+        cells_hbar = ttk.Scrollbar(self, orient=tk.HORIZONTAL)
         cells_hbar.configure(command=self._on_hbar)
         cells_canvas.configure(xscrollcommand=cells_hbar.set)
         self._offset_canvas.configure(xscrollcommand=cells_hbar.set)
-        self._cells_hbar: tk.Scrollbar = cells_hbar
+        self._cells_hbar: ttk.Scrollbar = cells_hbar
 
         # Cell status cache, faster than Tk
         self._cells_dirty: set = set()
@@ -476,7 +546,7 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self._cells_selected: set = set()
         self._cells_text_str: MutableMapping[CellCoords, str] = {}
 
-    def __init_chars_view(self):
+    def __init_chars_view(self) -> None:
         pad_x = self._pad_x
         font_w = self._font_w
         status = self._status
@@ -485,21 +555,21 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         chars_w = pad_x + (font_w * line_length) + pad_x
         chars_h = self._cells_pixel_size[1]
         chars_canvas = tk.Canvas(self, width=chars_w, height=chars_h, borderwidth=1, highlightthickness=0,
-                                 relief=tk.SUNKEN, bg='SystemWindow', cursor='xterm', scrollregion=(0, 0, chars_w, 1),
-                                 takefocus=1)
-        self._chars_canvas: tk.Canvas = chars_canvas
+                                      relief=tk.SUNKEN, bg=_COLOR_BG, cursor='xterm',
+                                      scrollregion=(0, 0, chars_w, 1), takefocus=1)
+        self._chars_canvas = chars_canvas
 
         self._chars_text_id: MutableMapping[CellCoords, CanvasObject] = {}
         self._chars_rect_id: MutableMapping[CellCoords, CanvasObject] = {}
 
-        chars_hbar = tk.Scrollbar(self, orient=tk.HORIZONTAL)
+        chars_hbar = ttk.Scrollbar(self, orient=tk.HORIZONTAL)
         chars_hbar.configure(command=chars_canvas.xview)
         chars_canvas.configure(xscrollcommand=chars_hbar.set)
-        self._chars_hbar: tk.Scrollbar = chars_hbar
+        self._chars_hbar: ttk.Scrollbar = chars_hbar
 
-        self._chars_title = tk.Label(self, text='Text', anchor=tk.W)
+        self._chars_title = ttk.Label(self, text='Text', anchor=tk.W)
 
-    def __init_layout(self):
+    def __init_layout(self) -> None:
         self._address_skip_label.grid(row=0, column=0, sticky=tk.EW)
         self._offset_canvas.grid(row=0, column=1, sticky=tk.EW)
         self._chars_title.grid(row=0, column=3, sticky=tk.EW)
@@ -516,8 +586,8 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self.columnconfigure(1, weight=6, minsize=64)
         self.columnconfigure(3, weight=1, minsize=64)
 
-    def __init_cursor(self):
-        color = 'SystemWindowText'
+    def __init_cursor(self) -> None:
+        color = _COLOR_FG
 
         self._cells_cursor_color: str = color
         cells_cursor_id = self._cells_canvas.create_line(-2, -2, -1, -1, width=2, fill=color, tags='cursor')
@@ -527,7 +597,7 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         chars_cursor_id = self._chars_canvas.create_line(-2, -2, -1, -1, width=2, fill=color, tags='cursor')
         self._chars_cursor_id: CanvasObject = chars_cursor_id
 
-    def __init_bindings(self):
+    def __init_bindings(self) -> None:
 
         control_bindings = {
             '<plus>':                  self.on_key_reserve_cell,
@@ -691,13 +761,13 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         # Bind widget actions
         self.bind('<Configure>', self.on_configure)
 
-    def focus_set(self):
+    def focus_set(self) -> None:
         self.focus_set_cells()
 
-    def focus_set_cells(self):
+    def focus_set_cells(self) -> None:
         self._cells_canvas.focus_set()
 
-    def focus_set_chars(self):
+    def focus_set_chars(self) -> None:
         if self._chars_visible:
             self._chars_canvas.focus_set()
         else:
@@ -1009,19 +1079,19 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self.update_view()
 
     def on_cells_focus_in(self, event=None):
-        self._cells_cursor_color = 'red'
+        self._cells_cursor_color = _COLOR_CUR
         self.update_cursor()
 
     def on_cells_focus_out(self, event=None):
-        self._cells_cursor_color = 'SystemWindowText'
+        self._cells_cursor_color = _COLOR_FG
         self.update_cursor()
 
     def on_chars_focus_in(self, event=None):
-        self._chars_cursor_color = 'red'
+        self._chars_cursor_color = _COLOR_CUR
         self.update_cursor()
 
     def on_chars_focus_out(self, event=None):
-        self._chars_cursor_color = 'SystemWindowText'
+        self._chars_cursor_color = _COLOR_FG
         self.update_cursor()
 
     def _on_wheel(self, event=None):
@@ -1230,8 +1300,8 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
                 address_canvas.coords(addr_text_id, addr_pixel_x, addr_pixel_y)
                 address_canvas.itemconfigure(addr_text_id, text=text)
             else:
-                addr_text_id = address_canvas.create_text(addr_pixel_x, addr_pixel_y,
-                                                          text=text, anchor=tk.NW, font=self._font)
+                addr_text_id = address_canvas.create_text(addr_pixel_x, addr_pixel_y, text=text, anchor=tk.NW,
+                                                          font=self._font, fill=_COLOR_FG)
             addrs_text_id[y] = addr_text_id
 
         # Remove trashed addresses
@@ -1292,20 +1362,22 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
 
             else:
                 cell_text_id = cells_canvas.create_text(cell_pixel_x, cell_pixel_y,
-                                                        anchor=tk.NW, font=font, tags='cell_text', text=cell_text)
+                                                        tags='cell_text', text=cell_text,
+                                                        anchor=tk.NW, font=font, fill=_COLOR_FG)
 
                 cell_rect_id = cells_canvas.create_rectangle(cell_pixel_x, cell_pixel_y,
                                                              cell_pixel_x + rect_w, cell_pixel_y + rect_h,
-                                                             tags='cell_rect', outline='', fill='SystemHighlight',
+                                                             tags='cell_rect', outline='', fill=_COLOR_SEL_BG,
                                                              state=tk.HIDDEN)
 
                 if chars_visible:
                     char_text_id = chars_canvas.create_text(char_pixel_x, char_pixel_y,
-                                                            anchor=tk.NW, font=font, tags='char_text', text=char_text)
+                                                            tags='char_text', text=char_text,
+                                                            anchor=tk.NW, font=font, fill=_COLOR_FG)
 
                     char_rect_id = chars_canvas.create_rectangle(char_pixel_x, char_pixel_y,
                                                                  char_pixel_x + font_w, char_pixel_y + font_h,
-                                                                 tags='char_rect', outline='', fill='SystemHighlight',
+                                                                 tags='char_rect', outline='', fill=_COLOR_SEL_BG,
                                                                  state=tk.HIDDEN)
 
             cells_text_id[x_y] = cell_text_id
@@ -1480,7 +1552,8 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         chars_text_id = self._chars_text_id
         chars_rect_id = self._chars_rect_id
         chars_visible = self._chars_visible
-        palette = ('SystemWindowText', _COLOR_ODD)
+        palette = (_COLOR_FG, _COLOR_OG)
+        palette_sel = (_COLOR_SEL_FG, _COLOR_SEL_OG)
 
         for y in range(cell_start_y, cell_endex_y):
             for x in range(cell_start_x, cell_endex_x):
@@ -1493,10 +1566,11 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
                     selected_before = x_y in cells_selected_before
 
                 if selected_before < selected_after:
-                    cells_canvas.itemconfigure(cells_text_id[x_y], fill='SystemHighlightText')
+                    color = palette_sel[x & 1]
+                    cells_canvas.itemconfigure(cells_text_id[x_y], fill=color)
                     cells_canvas.itemconfigure(cells_rect_id[x_y], state=tk.NORMAL)
                     if chars_visible:
-                        chars_canvas.itemconfigure(chars_text_id[x_y], fill='SystemHighlightText')
+                        chars_canvas.itemconfigure(chars_text_id[x_y], fill=color)
                         chars_canvas.itemconfigure(chars_rect_id[x_y], state=tk.NORMAL)
 
                 elif selected_before > selected_after:
@@ -1701,7 +1775,7 @@ class EditorWidget(BaseEditorWidget, tk.Frame):
         self._on_vbar(tk.SCROLL, step, tk.UNITS)
 
     def ask_big_selection(self, size: Address) -> bool:
-        answer = tkinter.messagebox.askquestion(
+        answer = tk.messagebox.askquestion(
             'Big selection',
             (f'{size} ({size:X}h) byes are selected.\n'
              f'Such a big size could create problems.\n'
@@ -1750,7 +1824,7 @@ class UserInterface(BaseUserInterface):
 
     def __init_top(self):
         top = tk.Toplevel(self._root)
-        self.top: tk.Toplevel = top
+        self.top = top
 
         top.withdraw()
         top.protocol('WM_DELETE_WINDOW', self._on_delete_window)
@@ -2178,7 +2252,7 @@ class UserInterface(BaseUserInterface):
                          image=load_image('image/16x16/info.png'), compound=tk.LEFT)
 
     def __init_toolbars(self):
-        toolbar_tray = ToolbarTray(self.top, padx=0, pady=0, borderwidth=1, relief=tk.SUNKEN)
+        toolbar_tray = ToolbarTray(self.top, padding=(0, 0), borderwidth=1, relief=tk.SUNKEN)
         self.toolbar_tray = toolbar_tray
 
         self.__init_toolbar_file()
@@ -2319,10 +2393,10 @@ class UserInterface(BaseUserInterface):
         toolbar.finalize()
 
     def __init_statusbar(self):
-        self.statusbar_frame = sb_frame = tk.Frame(self.top)
-        self.statusbar_address = sb_address = tk.Label(sb_frame, anchor=tk.W, relief=tk.SUNKEN, borderwidth=1)
-        self.statusbar_selection = sb_selection = tk.Label(sb_frame, anchor=tk.W, relief=tk.SUNKEN, borderwidth=1)
-        self.statusbar_cursor = sb_cursor = tk.Label(sb_frame, anchor=tk.W, relief=tk.SUNKEN, borderwidth=1)
+        self.statusbar_frame = sb_frame = ttk.Frame(self.top)
+        self.statusbar_address = sb_address = ttk.Label(sb_frame, anchor=tk.W, relief=tk.SUNKEN, borderwidth=1)
+        self.statusbar_selection = sb_selection = ttk.Label(sb_frame, anchor=tk.W, relief=tk.SUNKEN, borderwidth=1)
+        self.statusbar_cursor = sb_cursor = ttk.Label(sb_frame, anchor=tk.W, relief=tk.SUNKEN, borderwidth=1)
 
         sb_address.grid(row=0, column=0, sticky=tk.EW)
         sb_selection.grid(row=0, column=1, sticky=tk.EW)
@@ -2595,8 +2669,6 @@ class UserInterface(BaseUserInterface):
             self.offset_popup.grab_release()
 
     def __init_popup_chars(self):
-        engine = self.engine
-
         menu = tk.Menu(tearoff=False)
         self.chars_popup = menu
 
@@ -2753,7 +2825,7 @@ class UserInterface(BaseUserInterface):
         self.set_endin_text(text)
 
     def show_about(self):  # TODO: make better dedicated window
-        tkinter.messagebox.showinfo('About Hecks!', (
+        tk.messagebox.showinfo('About Hecks!', (
             'Copyright (c) 2021, Andrea Zoppi. All rights reserved.\n'
             '\n'
             'Hecks is free software: you can redistribute it and/or modify '
@@ -2771,61 +2843,61 @@ class UserInterface(BaseUserInterface):
         ))
 
     def show_info(self, title: str, message: str):
-        tkinter.messagebox.showinfo(title=title, message=message)
+        tk.messagebox.showinfo(title=title, message=message)
 
     def show_warning(self, title: str, message: str):
-        tkinter.messagebox.showwarning(title=title, message=message)
+        tk.messagebox.showwarning(title=title, message=message)
 
     def show_error(self, title: str, message: str):
-        tkinter.messagebox.showerror(title=title, message=message)
+        tk.messagebox.showerror(title=title, message=message)
 
     def ask_open_file_path(self) -> Optional[str]:
-        file_path = tkinter.filedialog.askopenfilename(filetypes=FILE_TYPES)
+        file_path = tk.filedialog.askopenfilename(filetypes=FILE_TYPES)
         return file_path
 
     def ask_save_file_path(self) -> Optional[str]:
-        file_path = tkinter.filedialog.asksaveasfilename(filetypes=FILE_TYPES)
+        file_path = tk.filedialog.asksaveasfilename(filetypes=FILE_TYPES)
         return file_path
 
     def ask_line_length_custom(self) -> Optional[int]:
-        value = tkinter.simpledialog.askinteger('Line length', 'Enter the line length:')
+        value = tk.simpledialog.askinteger('Line length', 'Enter the line length:')
         if value is not None:
             if 1 <= value <= 256:
                 self.line_length_tkvar.set(value)
                 return value
             else:
-                tkinter.messagebox.showerror('Invalid value', 'Only positive integers between 1 and 256 are accepted')
+                tk.messagebox.showerror('Invalid value', 'Only positive integers between 1 and 256 are accepted')
         return None
 
     def ask_address_bits_custom(self) -> Optional[int]:
-        value = tkinter.simpledialog.askinteger('Address bits', 'Enter the address bit size:')
+        value = tk.simpledialog.askinteger('Address bits', 'Enter the address bit size:')
         if value is not None:
             if 1 <= value <= 256:
                 self.address_bits_tkvar.set(value)
                 return value
             else:
-                tkinter.messagebox.showerror('Invalid value', 'Only positive integers between 1 and 256 are accepted')
+                tk.messagebox.showerror('Invalid value', 'Only positive integers between 1 and 256 are accepted')
         return None
 
     def ask_address_skip_custom(self) -> Optional[int]:
-        text = tkinter.simpledialog.askstring('Address skip', 'Enter the address skip:')
+        text = tk.simpledialog.askstring('Address skip', 'Enter the address skip:')
         if text is not None:
             try:
                 value = parse_int(text)[0]
             except ValueError:
-                tkinter.messagebox.showerror('Invalid value', 'Invalid address value format')
+                tk.messagebox.showerror('Invalid value', 'Invalid address value format')
             else:
                 self.address_skip_tkvar.set(value)
                 return value
         return None
 
     def ask_chars_encoding_custom(self) -> Optional[str]:
-        value = tkinter.simpledialog.askstring('Text encoding', 'Enter the Python text codec name:')
+        value = tk.simpledialog.askstring('Text encoding', 'Enter the Python text codec name:')
         if value is not None:
             try:
                 b'\0'.decode(encoding=value, errors='strict')
             except UnicodeDecodeError:
-                tkinter.messagebox.showerror('Invalid encoding', f'Python does not support the text codec: {value!r}')
+                tk.messagebox.showerror('Invalid encoding', f'Python does not support the text codec: {value!r}')
             else:
                 self.chars_encoding_tkvar.set(value)
                 return value
@@ -2864,12 +2936,12 @@ class UserInterface(BaseUserInterface):
         toolbar = self.toolbar_edit
         labels = ('Cut', 'Copy', 'Crop')
         for label in labels:
-            toolbar.get_widget(label).configure(state=state)
+            toolbar.get_widget(label).configure(cnf=dict(state=state))
 
         toolbar = self.toolbar_address
         labels = ('Move',)
         for label in labels:
-            toolbar.get_widget(label).configure(state=state)
+            toolbar.get_widget(label).configure(cnf=dict(state=state))
 
         self.update_menus_by_cursor()
 
@@ -3164,10 +3236,13 @@ class InstanceManager(BaseInstanceManager):
         super().__init__()
 
         # Create a hidden root window, not used by the application
-        root = tk.Tk()
+        # root = tk.Tk()
+        root = ttkthemes.ThemedTk(theme=_THEME)
         root.overrideredirect(True)
         root.withdraw()
-        self._root: tk.Tk = root
+        # self._root: tk.Tk = root
+        self._root: ttkthemes.ThemedTk = root
+        _fix_global_colors(root)
 
     def remove(self, index: int) -> object:
         instance = super().remove(index)
@@ -3185,7 +3260,8 @@ class InstanceManager(BaseInstanceManager):
         self._root.destroy()
 
     @property
-    def root(self) -> tk.Tk:
+    # def root(self) -> tk.Tk:
+    def root(self) -> ttkthemes.ThemedTk:
         return self._root
 
 

@@ -1153,15 +1153,15 @@ class BaseEditorWidget(abc.ABC):
             self.redraw()
 
     @abc.abstractmethod
-    def focus_set(self):
+    def focus_set(self) -> None:
         ...
 
     @abc.abstractmethod
-    def focus_set_cells(self):
+    def focus_set_cells(self) -> None:
         ...
 
     @abc.abstractmethod
-    def focus_set_chars(self):
+    def focus_set_chars(self) -> None:
         ...
 
     @abc.abstractmethod

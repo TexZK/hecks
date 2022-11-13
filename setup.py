@@ -72,6 +72,7 @@ setup(
         'click',
         'hexrec>=0.2.2',
         'pyperclip',
+        'ttkthemes',
     ],
     extras_require={
     },
