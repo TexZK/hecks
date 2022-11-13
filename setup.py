@@ -51,10 +51,13 @@ setup(
         # http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
+        'Intended Audience :: Information Technology',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only ',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
@@ -62,7 +65,6 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Scientific/Engineering',
-        'Topic :: Software Development',
         'Topic :: Utilities',
     ],
     keywords=[
@@ -75,13 +77,13 @@ setup(
         'ttkthemes',
     ],
     extras_require={
+        'testing': [
+            'pytest',
+        ],
     },
     entry_points={
         'console_scripts': [
             'hecks = hecks.cli:main',
-        ],
-        'testing': [
-            'pytest',
         ],
     },
 )
