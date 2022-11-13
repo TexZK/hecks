@@ -263,9 +263,8 @@ def memory_to_clipboard(
 def iter_lines(text: str) -> Iterator[str]:
     start = 0
     while 1:
-        try:
-            endex = text.index('\n', start)
-        except ValueError:
+        endex = text.find('\n', start)
+        if endex < 0:
             endex = len(text)
         yield text[start:endex]
         start = endex + 1
