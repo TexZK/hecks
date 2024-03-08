@@ -29,8 +29,7 @@ from typing import cast as _cast
 from bytesparse.base import Address
 from bytesparse.base import Value
 from bytesparse.inplace import Memory
-import hexrec.blocks as _hb
-import hexrec.records as _hr
+import hexrec
 import pyperclip
 
 from .common import BIG_SELECTION_SIZE
@@ -820,14 +819,13 @@ class Engine(BaseEngine):
     def _file_load(self, file_path: str) -> Memory:
         del self
         try:
-            record_type = _hr.find_record_type(file_path)
-        except KeyError:
+            hexrec_file = hexrec.load(file_path)
+        except ValueError:
             with open(file_path, 'rb') as stream:
                 data = stream.read()
             memory = Memory.from_bytes(data)
         else:
-            blocks = _hr.load_blocks(file_path, record_type=record_type)
-            memory = Memory.from_blocks(blocks)
+            memory = hexrec_file.memory
         return memory
 
     def on_file_open(self) -> None:
@@ -854,7 +852,7 @@ class Engine(BaseEngine):
 
     def _file_save(self, file_path: str, memory: Memory) -> None:
         try:
-            record_type = _hr.find_record_type(file_path)
+            hexrec_type = hexrec.guess_format_type(file_path)
         except KeyError:
             if memory.contiguous:
                 with open(file_path, 'wb') as stream:
@@ -865,7 +863,8 @@ class Engine(BaseEngine):
                                    'Cannot save a non-contiguous\n'
                                    'chunk of data as binary file')
         else:
-            _hr.save_blocks(file_path, list(memory.blocks()), record_type=record_type)
+            hexrec_file = hexrec_type.from_memory(memory)
+            hexrec_file.save(file_path)
 
     def on_file_save(self) -> None:
         status = self.status
@@ -944,7 +943,9 @@ class Engine(BaseEngine):
             if endin < start:
                 endin, start = start, endin
             memory = status.memory.extract(start, endin + 1)
-            _hr.save_blocks(path, memory._blocks)
+            hexrec_type = hexrec.guess_format_type(path)
+            hexrec_file = hexrec_type.from_memory(memory)
+            hexrec_file.save(path)
 
     def on_edit_select_all(self) -> None:
         self.select_all()

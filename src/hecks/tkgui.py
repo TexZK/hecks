@@ -32,6 +32,16 @@ from typing import Tuple
 from typing import Union
 from typing import cast as _cast
 
+from bytesparse.base import Address
+from hexrec.formats.asciihex import AsciiHexFile
+from hexrec.formats.avr import AvrFile
+from hexrec.formats.ihex import IhexFile
+from hexrec.formats.mos import MosFile
+from hexrec.formats.raw import RawFile
+from hexrec.formats.srec import SrecFile
+from hexrec.formats.titxt import TiTxtFile
+from hexrec.formats.xtek import XtekFile
+
 from .common import ADDRESS_BITS
 from .common import BYTE_ENCODINGS
 from .common import LINE_LENGTHS
@@ -52,7 +62,6 @@ from .engine import Engine
 from .utils import HEX_SET
 from .utils import ValueFormatEnum
 from .utils import parse_int
-from bytesparse.base import Address
 
 
 # =====================================================================================================================
@@ -144,23 +153,19 @@ def load_image(path: str) -> tk.PhotoImage:
 # =====================================================================================================================
 
 def __merge_extensions(hexrec_format):
-    extensions = hexrec_format.Record.EXTENSIONS
+    extensions = hexrec_format.FILE_EXT
     return ';'.join(f'*{ext}' for ext in extensions)
 
 
-if 1:  # import location hack
-    import hexrec.formats.binary as _hf_binary
-    import hexrec.formats.intel as _hf_intel
-    import hexrec.formats.mos as _hf_mos
-    import hexrec.formats.motorola as _hf_motorola
-    import hexrec.formats.tektronix as _hf_tektronix
-
 FILE_TYPES = (
-    ('Binary', __merge_extensions(_hf_binary)),
-    ('Intel HEX', __merge_extensions(_hf_intel)),
-    ('MOS', __merge_extensions(_hf_mos)),
-    ('Motorola S-record', __merge_extensions(_hf_motorola)),
-    ('Tektronix', __merge_extensions(_hf_tektronix)),
+    ('Raw binary', __merge_extensions(RawFile)),
+    ('ASCII-HEX', __merge_extensions(AsciiHexFile)),
+    ('Atmel Generic AVR', __merge_extensions(AvrFile)),
+    ('Intel HEX', __merge_extensions(IhexFile)),
+    ('MOS Technology', __merge_extensions(MosFile)),
+    ('Motorola S-record', __merge_extensions(SrecFile)),
+    ('TI-TXT', __merge_extensions(TiTxtFile)),
+    ('Tektronix Extended', __merge_extensions(XtekFile)),
     ('All files', '*'),
 )
 

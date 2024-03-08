@@ -70,9 +70,8 @@ setup(
     keywords=[
     ],
     install_requires=[
-        'bytesparse',
         'click',
-        'hexrec>=0.2.2',
+        'hexrec >= 0.4.0',
         'pyperclip',
         'ttkthemes',
     ],
