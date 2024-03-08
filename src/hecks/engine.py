@@ -160,6 +160,7 @@ class Engine(BaseEngine):
 
         if offset:
             memory = self.status.memory
+            # TODO: add memento
             memory.shift(offset)
 
             widget = self.ui.editor
@@ -180,6 +181,7 @@ class Engine(BaseEngine):
 
                 memory = status.memory
                 chunk = memory.extract(start, endex)
+                # TODO: add memento
                 memory.delete(start, endex)
                 start += offset
                 endex += offset
@@ -215,6 +217,7 @@ class Engine(BaseEngine):
         value_before = memory.peek(address)
         if insert:
             widget.mark_dirty_range(address)
+            # TODO: add memento
             memory.poke(address, 0)
             value = 0
         else:
@@ -265,6 +268,7 @@ class Engine(BaseEngine):
             memory.poke(address, value)
         else:
             widget.mark_dirty_cell(*status.cursor_cell)
+            # TODO: add memento
             memory.poke(address, value)
         widget.update_view(force_content=True)
 
@@ -283,6 +287,7 @@ class Engine(BaseEngine):
 
         if not sel_mode_before:
             address = status.cursor_address
+            # TODO: add memento
             status.memory.reserve(address, address + 1)
             widget.mark_dirty_range(address)
             widget.update_view(force_content=True)
@@ -297,6 +302,7 @@ class Engine(BaseEngine):
 
         if not sel_mode_before:
             address = status.cursor_address
+            # TODO: add memento
             status.memory.clear(address, address + 1)
             cell_x, cell_y = status.cursor_cell
             widget.mark_dirty_cell(cell_x, cell_y)
@@ -312,6 +318,7 @@ class Engine(BaseEngine):
 
         if not sel_mode_before:
             address = status.cursor_address
+            # TODO: add memento
             status.memory.delete(address, address + 1)
             widget.mark_dirty_range(address)
             widget.update_view(force_content=True)
@@ -339,6 +346,7 @@ class Engine(BaseEngine):
             widget.mark_dirty_range(address_start)
 
             if sel_mode == SelectionMode.NORMAL:
+                # TODO: add memento
                 operate(address_start, address_endex)
                 widget.update_view(force_content=True)
 
@@ -347,6 +355,7 @@ class Engine(BaseEngine):
                 cell_w = cell_endin[0] + 1 - cell_start[0]
 
                 while address_endex > address_start:
+                    # TODO: add memento
                     operate(address_endex - cell_w, address_endex)
                     address_endex -= line_length
 
@@ -372,6 +381,7 @@ class Engine(BaseEngine):
             endin = status.sel_endin_address
             if endin < start:
                 start, endin = endin, start
+            # TODO: add memento
             status.memory.crop(start, endin + 1)
             widget.mark_dirty_all()
             widget.update_view(force_content=True)
@@ -426,7 +436,6 @@ class Engine(BaseEngine):
             del clipboard
             start = memory.start
             endex = memory.endex
-            blocks = memory._blocks
 
             target_start = address
             target_endex = address + endex - start
@@ -435,11 +444,11 @@ class Engine(BaseEngine):
                 status.memory.clear(target_start, target_endex)
                 widget.mark_dirty_range(target_start, target_endex)
 
-            if blocks:
-                for block_start, block_data in blocks:
-                    target_address = address + block_start - start
-                    status.memory.write(target_address, block_data)
-                    widget.mark_dirty_range(address, address + len(block_data))
+            for block_start, block_data in memory.blocks():
+                target_address = address + block_start - start
+                # TODO: add memento
+                status.memory.write(target_address, block_data)
+                widget.mark_dirty_range(address, address + len(block_data))
 
             self.goto_memory_absolute(target_endex)
             widget.update_view(force_content=True)
@@ -455,6 +464,7 @@ class Engine(BaseEngine):
             start, endex, _ = status.memory.equal_span(status.cursor_address)
 
             if start is not None and endex is not None and start < endex:
+                # TODO: add memento
                 status.memory.fill(start, endex, value)
                 widget.mark_dirty_range(start, endex)
 
@@ -468,6 +478,7 @@ class Engine(BaseEngine):
             if endin < start:
                 start, endin = endin, start
             endex = endin + 1
+            # TODO: add memento
             status.memory.fill(start, endex, value)
             widget.mark_dirty_range(start, endex)
 
@@ -494,6 +505,7 @@ class Engine(BaseEngine):
             if endin < start:
                 start, endin = endin, start
             endex = endin + 1
+            # TODO: add memento
             status.memory.flood(start, endex, value)
             widget.mark_dirty_range(start, endex)
 
@@ -514,6 +526,7 @@ class Engine(BaseEngine):
             endin = status.sel_endin_address
             if endin < start:
                 start, endin = endin, start
+            # TODO: add memento
             status.memory.reserve(start, endin + 1 - start)
             widget.mark_dirty_range(start)
             widget.update_view(force_content=True)
@@ -621,36 +634,23 @@ class Engine(BaseEngine):
         self._update_selection(selecting)
 
     def goto_memory_relative(self, delta: Address, selecting: bool = False) -> None:
-        status = self.status
-        address = status.cursor_address + delta
+        address = self.status.cursor_address + delta
         self.goto_memory_absolute(address, selecting=selecting)
 
     def goto_memory_start(self, selecting: bool = False) -> None:
-        status = self.status
-        cell_format_length = status.cell_format_length
-        cell_x, cell_y = status.address_to_cell_coords(status.memory.start)
-        self._move_cursor_to_char((cell_x * cell_format_length), cell_y)
-        self._update_selection(selecting)
+        self.goto_memory_absolute(self.status.memory.start, selecting=selecting)
 
     def goto_memory_endin(self, selecting: bool = False) -> None:
-        status = self.status
-        cell_format_length = status.cell_format_length
-        cell_x, cell_y = status.address_to_cell_coords(max(status.memory.start, status.memory.endex - 1))
-        self._move_cursor_to_char((cell_x * cell_format_length) + (cell_format_length - 1), cell_y)
-        self._update_selection(selecting)
+        self.goto_memory_absolute(self.status.memory.endin, selecting=selecting)
 
     def goto_memory_endex(self, selecting: bool = False) -> None:
-        status = self.status
-        cell_format_length = status.cell_format_length
-        cell_x, cell_y = status.address_to_cell_coords(status.memory.endex)
-        self._move_cursor_to_char((cell_x * cell_format_length), cell_y)
-        self._update_selection(selecting)
+        self.goto_memory_absolute(self.status.memory.endex, selecting=selecting)
 
     def goto_line_start(self, selecting: bool = False) -> None:
         status = self.status
         cell_format_length = status.cell_format_length
         status.cursor_digit = 0
-        delta = (status.cursor_cell[0] * cell_format_length)
+        delta = status.cursor_cell[0] * cell_format_length
         self._move_cursor_by_char(-delta, 0)
         self._update_selection(selecting)
 
@@ -659,7 +659,7 @@ class Engine(BaseEngine):
         cell_format_length = status.cell_format_length
         status.cursor_digit = cell_format_length - 1
         char_endin = (status.line_length - 1) * cell_format_length
-        delta = (status.cursor_cell[0] * cell_format_length)
+        delta = status.cursor_cell[0] * cell_format_length
         delta = char_endin - delta
         self._move_cursor_by_char(+delta, 0)
         self._update_selection(selecting)
@@ -668,30 +668,30 @@ class Engine(BaseEngine):
         status = self.status
         cell_format_length = status.cell_format_length
         status.cursor_digit = cell_format_length - 1
-        delta = (status.cursor_cell[0] * cell_format_length)
+        delta = status.cursor_cell[0] * cell_format_length
         delta = (status.line_length - 1) * cell_format_length - delta
         self._move_cursor_by_char(delta, 0)
         self._update_selection(selecting)
 
     def goto_block_start(self, selecting: bool = False):
         status = self.status
-        memory_blocks = status.memory._blocks
+        memory = status.memory
         cursor_address = status.cursor_address
-        block_index = _hb.locate_at(memory_blocks, cursor_address)
+        block_index = memory._block_index_at(cursor_address)
         if block_index is None:
             # Cursor within emptiness
-            block_index = _hb.locate_start(memory_blocks, cursor_address) - 1
+            block_index = memory._block_index_start(cursor_address) - 1
             if block_index < 0:
                 # If before memory start, no action is performed
                 pass
             else:
                 # If within a hole, go to the start of the hole
-                block_start, block_items = memory_blocks[block_index]
+                block_start, block_items = memory._blocks[block_index]
                 block_endex = block_start + len(block_items)
                 self.goto_memory_absolute(block_endex, selecting=selecting)
         else:
             # Cursor within an actual block
-            block_start, block_items = memory_blocks[block_index]
+            block_start, block_items = memory._blocks[block_index]
             block_endex = block_start + len(block_items)
             if block_start < block_endex:
                 # Block has actual items, go to its start
@@ -702,22 +702,22 @@ class Engine(BaseEngine):
 
     def goto_block_endin(self, selecting: bool = False):
         status = self.status
-        memory_blocks = status.memory._blocks
+        memory = status.memory
         cursor_address = status.cursor_address
-        block_index = _hb.locate_at(memory_blocks, cursor_address)
+        block_index = memory._block_index_at(cursor_address)
         if block_index is None:
             # Cursor within emptiness
-            block_index = _hb.locate_start(memory_blocks, cursor_address)
-            if block_index < len(memory_blocks):
+            block_index = memory._block_index_start(cursor_address)
+            if block_index < memory.content_parts:
                 # If within a hole, go to the end of the hole
-                block_start, _ = memory_blocks[block_index]
+                block_start, _ = memory._blocks[block_index]
                 self.goto_memory_absolute(block_start - 1, selecting=selecting)
             else:
                 # If after memory end, no action is performed
                 pass
         else:
             # Cursor within an actual block
-            block_start, block_items = memory_blocks[block_index]
+            block_start, block_items = memory._blocks[block_index]
             block_endex = block_start + len(block_items)
             if block_start < block_endex:
                 # Block has actual items, go to its end
@@ -728,12 +728,12 @@ class Engine(BaseEngine):
 
     def goto_block_previous(self, selecting: bool = False):
         status = self.status
-        memory_blocks = status.memory._blocks
+        memory = status.memory
         cursor_address = status.cursor_address
-        block_index = _hb.locate_start(memory_blocks, cursor_address) - 1
+        block_index = memory._block_index_start(cursor_address) - 1
         while block_index >= 0:
             # Block available
-            block_start, block_items = memory_blocks[block_index]
+            block_start, block_items = memory._blocks[block_index]
             block_endex = block_start + len(block_items)
             if block_start < block_endex:
                 # Block has actual items, go to its end
@@ -748,12 +748,12 @@ class Engine(BaseEngine):
 
     def goto_block_next(self, selecting: bool = False):
         status = self.status
-        memory_blocks = status.memory._blocks
+        memory = status.memory
         cursor_address = status.cursor_address
-        block_index = _hb.locate_endex(memory_blocks, cursor_address)
-        while block_index < len(memory_blocks):
+        block_index = memory._block_index_endex(cursor_address)
+        while block_index < memory.content_parts:
             # Block available
-            block_start, block_items = memory_blocks[block_index]
+            block_start, block_items = memory._blocks[block_index]
             block_endex = block_start + len(block_items)
             if block_start < block_endex:
                 # Block has actual items, go to its start

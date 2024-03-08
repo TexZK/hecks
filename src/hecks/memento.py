@@ -68,6 +68,7 @@ class MoveCursor(BaseMemento):
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+
 class MoveMemory(BaseMemento):
 
     def __init__(
@@ -77,27 +78,40 @@ class MoveMemory(BaseMemento):
         offset: Address,
     ):
         super().__init__(engine, status)
-        self._offset: Address = offset
-        self._backups: List[Memory] = []
+        memory = status.memory
+        offset, backup = memory.shift_backup(offset)
+
+        self._offset = offset
+        self._backup = backup
 
     def redo(self) -> None:
-        backups = self._backups
-        backups.clear()
-        memory = self._status.memory
-        memory.shift(self._offset, backups=backups)
-        # FIXME: Update widget memory data
-        # FIXME: Move cursor to start of shifted block
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        offset = self._offset
+
+        engine.escape_selection()
+        cursor_address = status.cursor_address
+        memory.shift(offset)
+        engine.goto_memory_absolute(cursor_address + offset)
+        engine.on_view_redraw()
 
     def undo(self) -> None:
-        memory = self._status.memory
-        memory.shift(-self._offset)
-        for backup in reversed(self._backups):
-            memory.write(0, backup)
-        # FIXME: Update widget memory data
-        # FIXME: Move cursor to start of first backup block
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        offset = self._offset
+        backup = self._backup
+
+        engine.escape_selection()
+        cursor_address = status.cursor_address
+        memory.shift_restore(offset, backup)
+        engine.goto_memory_absolute(cursor_address - offset)
+        engine.on_view_redraw()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+
 class WriteData(BaseMemento):
 
     def __init__(
@@ -108,28 +122,40 @@ class WriteData(BaseMemento):
         data: AnyBytes,
     ):
         super().__init__(engine, status)
-        self._address: Address = address
-        self._data: AnyBytes = data
-        self._backups: List[Memory] = []
+        memory = status.memory
+        backups = memory.write_backup(address, data)
+
+        self._address = address
+        self._data = data
+        self._backups = backups
 
     def redo(self) -> None:
-        backups = self._backups
-        backups.clear()
-        memory = self._status.memory
-        memory.write(self._address, self._data, backups=backups)
-        # FIXME: Update widget memory data
-        # FIXME: Move cursor to endex of written block
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        address = self._address
+        data = self._data
+
+        engine.escape_selection()
+        memory.write(address, data)
+        engine.goto_memory_absolute(address + len(data))
+        engine.on_view_redraw()
 
     def undo(self) -> None:
-        memory = self._status.memory
-        memory.clear(self._address, len(self._data))
-        for backup in reversed(self._backups):
-            memory.write(0, backup)
-        # FIXME: Update widget memory data
-        # FIXME: Move cursor to start of first backup block
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        address = self._address
+        backups = self._backups
+
+        engine.escape_selection()
+        memory.write_restore(backups)
+        engine.goto_memory_absolute(address)
+        engine.on_view_redraw()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+
 class ClearData(BaseMemento):
 
     def __init__(
@@ -139,25 +165,79 @@ class ClearData(BaseMemento):
         address: Address,
         size: int,
     ):
-        if size < 1:
-            raise ValueError('size must be positive')
         super().__init__(engine, status)
-        self._address: Address = address
-        self._size: int = size
-        self._backups: List[Memory] = []
+        memory = status.memory
+        backup = memory.clear_backup(address, address + size)
+
+        self._address = address
+        self._size = size
+        self._backup = backup
 
     def redo(self) -> None:
-        backups = self._backups
-        backups.clear()
-        memory = self._status.memory
-        memory.clear(self._address, self._address + self._size, backups=backups)
-        # FIXME: Update widget memory data
-        # FIXME: Move cursor to endex of cleared block
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        address = self._address
+        size = self._size
+
+        engine.escape_selection()
+        memory.clear(address, address + size)
+        engine.goto_memory_absolute(address)
+        engine.on_view_redraw()
 
     def undo(self) -> None:
-        memory = self._status.memory
-        memory.clear(self._address, self._address + self._size)
-        for backup in reversed(self._backups):
-            memory.write(0, backup)
-        # FIXME: Update widget memory data
-        # FIXME: Move cursor to start of first backup block
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        address = self._address
+        backup = self._backup
+
+        engine.escape_selection()
+        memory.clear_restore(backup)
+        engine.goto_memory_absolute(address)
+        engine.on_view_redraw()
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+class DeleteData(BaseMemento):
+
+    def __init__(
+        self,
+        engine: BaseEngine,
+        status: EngineStatus,
+        address: Address,
+        size: int,
+    ):
+        super().__init__(engine, status)
+        memory = status.memory
+        backup = memory.delete_backup(address, address + size)
+
+        self._address = address
+        self._size = size
+        self._backup = backup
+
+    def redo(self) -> None:
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        address = self._address
+        size = self._size
+
+        engine.escape_selection()
+        memory.delete(address, address + size)
+        engine.goto_memory_absolute(address)
+        engine.on_view_redraw()
+
+    def undo(self) -> None:
+        engine = self._engine
+        status = self._status
+        memory = status.memory
+        address = self._address
+        size = self._size
+        backup = self._backup
+
+        engine.escape_selection()
+        memory.delete_restore(backup)
+        engine.goto_memory_absolute(address + size)
+        engine.on_view_redraw()
